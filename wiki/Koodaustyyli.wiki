@@ -1,6 +1,5 @@
-#summary One-sentence summary of this page.
 #labels Phase-Design
-Tällä sivulla käsitellään lyhyesti projektin koodaustyyliä.
+# Tällä sivulla käsitellään lyhyesti projektin koodaustyyliä.
 
 = Muuttujien nimeäminen =
 
@@ -20,4 +19,3 @@ Jos muuttujan tyyppi on pitkä ja koostuu useasta sanasta, voidaan se lyhentää
 {{{
 self.gwEsim = QtGui.QGraphicsView()
 }}}
-
