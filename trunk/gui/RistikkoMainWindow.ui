@@ -1,0 +1,279 @@
+<ui version="4.0" >
+ <class>RistikkoMainWindow</class>
+ <widget class="QMainWindow" name="RistikkoMainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>46</y>
+     <width>1000</width>
+     <height>633</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuTiedosto" >
+    <property name="title" >
+     <string>&amp;Tiedosto</string>
+    </property>
+    <addaction name="actionUusi" />
+    <addaction name="actionAvaa" />
+    <addaction name="actionTallenna" />
+    <addaction name="actionTallennaNimella" />
+    <addaction name="separator" />
+    <addaction name="actionSulje" />
+   </widget>
+   <widget class="QMenu" name="menu_Ohje" >
+    <property name="title" >
+     <string>&amp;Ohje</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuNayta" >
+    <property name="title" >
+     <string>&amp;Näytä</string>
+    </property>
+    <widget class="QMenu" name="menuTyokalupalkit" >
+     <property name="title" >
+      <string>Työkalupalkit</string>
+     </property>
+     <addaction name="actionTiedostoTB" />
+     <addaction name="actionNaytaTB" />
+    </widget>
+    <addaction name="actionLahenna" />
+    <addaction name="actionLoitonna" />
+    <addaction name="separator" />
+    <addaction name="actionRuudukko" />
+    <addaction name="menuTyokalupalkit" />
+   </widget>
+   <addaction name="menuTiedosto" />
+   <addaction name="menuNayta" />
+   <addaction name="menu_Ohje" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>679</y>
+     <width>1000</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolBarPerus" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>22</y>
+     <width>135</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="windowTitle" >
+    <string>Tiedosto</string>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionUusi" />
+   <addaction name="actionAvaa" />
+   <addaction name="actionTallenna" />
+  </widget>
+  <widget class="QToolBar" name="toolBarNayta" >
+   <property name="geometry" >
+    <rect>
+     <x>135</x>
+     <y>22</y>
+     <width>865</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="windowTitle" >
+    <string>Näytä</string>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLahenna" />
+   <addaction name="actionLoitonna" />
+   <addaction name="separator" />
+   <addaction name="actionRuudukko" />
+  </widget>
+  <action name="actionSulje" >
+   <property name="text" >
+    <string>&amp;Sulje</string>
+   </property>
+   <property name="toolTip" >
+    <string>Sulje sovellus</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionUusi" >
+   <property name="text" >
+    <string>&amp;Uusi</string>
+   </property>
+   <property name="toolTip" >
+    <string>Uusi ristikko</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionAvaa" >
+   <property name="text" >
+    <string>Avaa</string>
+   </property>
+   <property name="toolTip" >
+    <string>Avaa ristikko</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionTallenna" >
+   <property name="text" >
+    <string>Tallenna</string>
+   </property>
+   <property name="toolTip" >
+    <string>Tallenna ristikko</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionTallennaNimella" >
+   <property name="text" >
+    <string>Tallenna nimellä</string>
+   </property>
+   <property name="toolTip" >
+    <string>Tallenna ristikko nimellä</string>
+   </property>
+  </action>
+  <action name="actionRuudukko" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Ruudukko</string>
+   </property>
+  </action>
+  <action name="actionLahenna" >
+   <property name="text" >
+    <string>Lähennä</string>
+   </property>
+   <property name="shortcut" >
+    <string>+</string>
+   </property>
+  </action>
+  <action name="actionLoitonna" >
+   <property name="text" >
+    <string>Loitonna</string>
+   </property>
+   <property name="shortcut" >
+    <string>-</string>
+   </property>
+  </action>
+  <action name="actionNaytaTB" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Näytä</string>
+   </property>
+  </action>
+  <action name="actionTiedostoTB" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Tiedosto</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionSulje</sender>
+   <signal>triggered()</signal>
+   <receiver>RistikkoMainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNaytaTB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>toolBarNayta</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>467</x>
+     <y>33</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionTiedostoTB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>toolBarPerus</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>67</x>
+     <y>33</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
