@@ -1,7 +1,7 @@
+#summary Tällä sivulla käsitellään lyhyesti projektin koodaustyyliä.
 #labels Phase-Design
-#Tällä sivulla käsitellään lyhyesti projektin koodaustyyliä.
 
-= Muuttujien nimeäminen =
+= Nimeäminen =
 
 Muuttujien nimeämiseen käytetään nk. [http://fi.wikipedia.org/wiki/CamelCase CamelCase] tyyliä, jossa useista sanoista koostuvat muuttujat kirjoitetaan yhteen isoin alkukirjaimin.
 Luokat, modulien funktiot ja modulien muuttujat aloitetaan aina isolla alkukirjaimella, jos ne ovat julkisia. Sen sijaan luokkien sisäiset muuttujat ja funktiot aloitetaan aina pienellä alkukirjaimella. Luokat jotka perivät jonkun Qt:n luokan nimetään niin, että
