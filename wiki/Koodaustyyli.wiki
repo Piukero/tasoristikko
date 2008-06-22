@@ -20,7 +20,7 @@ Jos muuttujan tyyppi on pitkä ja koostuu useasta sanasta, voidaan se lyhentää
 self.gwEsim = QtGui.QGraphicsView()
 }}}
 
-Paketit nimetään myös CamelCase tyylillä, tosin niissä voidaan käyttää tarpeen mukaan isoja tai pieniä alkukirjaimia. Modulit sen sijaan nimetään aina käyttäen pieniä kirjaimia. Myös silloin, kun nimi koostuu useasta kirjaimesta. Qt:n .ui-tiedostoista luodut Python modulit nimetään käyttäen 'ui_' etuliitettä.
+Paketit nimetään myös [http://fi.wikipedia.org/wiki/CamelCase CamelCase] tyylillä, tosin niissä voidaan käyttää tarpeen mukaan isoja tai pieniä alkukirjaimia. Modulit sen sijaan nimetään aina käyttäen pieniä kirjaimia. Myös silloin, kun nimi koostuu useasta kirjaimesta. Qt:n .ui-tiedostoista luodut Python modulit nimetään käyttäen 'ui_' etuliitettä.
 
 = Luokkien muuttujat =
 
