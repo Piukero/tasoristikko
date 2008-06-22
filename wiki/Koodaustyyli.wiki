@@ -1,5 +1,5 @@
 #labels Phase-Design
-# Tällä sivulla käsitellään lyhyesti projektin koodaustyyliä.
+#Tällä sivulla käsitellään lyhyesti projektin koodaustyyliä.
 
 = Muuttujien nimeäminen =
 
