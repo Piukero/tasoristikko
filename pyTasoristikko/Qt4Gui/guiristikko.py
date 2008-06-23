@@ -53,6 +53,12 @@ class QSauva(QtGui.QGraphicsItem, Sauva):
     def __init__(self, ristikko, nivel1=None, nivel2=None):
         QtGui.QGraphicsItem.__init__(self)
         Sauva.__init__(self, ristikko, nivel1, nivel2)
+        self.pen = QtGui.QPen() #: Piirtämiseen käytettävä QPen
+        self.pen.setWidth(6)
+
+    def paint(self, painter, option, widget):
+        painter.setPen(self.pen)
+        painter.drawLine(QtCore.QLineF(self.n1.pos(), self.n2.pos()))
 
 class QPistekuorma(QtGui.QGraphicsItem, Pistekuorma):
     """Tämä luokka kuvaa piirettävää pistekuormaa."""

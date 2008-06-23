@@ -24,9 +24,13 @@ class GuiRistikkotehdas(Ristikkotehdas):
         """Konstruktori.
         @param scene: QRistikkoScene, johon tämä ristikko lisätään
         @type scene:
-        L{QRistikkoScene<pyTasorististikko.Qt4Gui.ristikkonakyma.QRistikkoScene>}"""
-        Ritikkotehdas.__init__(self, ristikko)
-        self.scene = scene # QGraphicsScene johon ristikko kuuluu
+        L{QRistikkoScene<ristikkonakyma.QRistikkoScene>}
+        @param ristikko: Käytettävä ristikko
+        @type ristikko: L{Ristikko<pyTasoristikko.ristikko.Ristikko>}"""
+        Ristikkotehdas.__init__(self, ristikko)
+        self.scene = scene
+        """@ivar: Scene johon ristikko lisätään
+        @type: L{QRistikkoScene<ristikkonakyma.QRistikkoScene>}"""
 
     def luoNivel(self, x, y, nimi):
         nivel = QNivel(self.ristikko, self.scene, x, y)

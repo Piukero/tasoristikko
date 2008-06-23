@@ -17,6 +17,12 @@
 
 u"""pyTasoristikko-paketti on Tasoristikko-ohjelman API."""
 
-__all__ = [ 'ristikko', 'ratkaisija', 'ristikkoIO' ]
+__all__ = [ 'ristikko', 'ratkaisija', 'ristikkoIO', 'ristikkotehdas']
+
+__author__ = 'Ville Leskinen'
 
 __version__ = "0.0.1"
+
+__url__ = 'http://code.google.com/p/tasoristikko/'
+
+__license__ = 'GPL-v3'
