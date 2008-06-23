@@ -176,4 +176,13 @@ class QNivelKoordinaattiWidget(QtGui.QGraphicsWidget):
         self.setPos(self.nivel.pos() + QtCore.QPointF(6, -6))
         self.lineEditX.setText('%.2f' % self.nivel.x)
         self.lineEditY.setText('%.2f' % self.nivel.y)
+        #TODO: asetetaan tälle focus
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.setVisible(False)
+        elif event.key() == QtCore.Qt.Key_Return:
+            self.vaihdaKoordinaatit()
+        else:
+            QtGui.QGraphicsWidget.keyPressEvent(self, event)
 

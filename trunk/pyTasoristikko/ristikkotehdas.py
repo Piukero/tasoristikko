@@ -21,14 +21,16 @@ käytettävän ristikon."""
 
 from ristikko import Ristikko
 
-class RistikkoTehdas(object):
+class Ristikkotehdas(object):
     """Ristikkoja luova luokka."""
     def __init__(self, ristikko = None):
         """Konstruktori. Parametriksi voi antaa ristikon, jos se on eri kuin
         perusristikko.
         @param ristikko: luotava ristikko
         @type ristikko: L{Ristikko<pyTasoristikko.ristikko.Ristikko>}"""
-        self.ristikko = ristikko #: luotava ristikko 
+        self.ristikko = ristikko
+        """@ivar: Luotava ristikko
+        @type: L{Ristikko<ristikko.Ristikko>}"""
         if not self.ristikko:
             self.ristikko = Ristikko()
 

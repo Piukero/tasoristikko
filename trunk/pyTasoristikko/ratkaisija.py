@@ -25,13 +25,13 @@ from numpy.linalg import solve
 def MuodostaKerroinmatriisi(nivelet, sauvat, tukivoimat):
     """Muodostaa lineaarisen yhtälöryhmän kerroinmatriisin.
     @param nivelet: ristikon nivelet
-    @type nivelet: list
+    @type nivelet: C{list} of L{Nivel<ristikko.Nivel>}
     @param sauvat: ristikon sauvat
-    @type sauvat: list
+    @type sauvat: C{list} of L{Sauva<ristikko.Sauva>}
     @param tukivoimat: ristikon tukivoimat
-    @type tukivoimat: list
+    @type tukivoimat: C{list} of L{Tukivoima<ristikko.Tukivoima>}
     @returns: yhtälöryhman kerroinmatriisi
-    @rtype: numpy.array"""
+    @rtype: C{numpy.array}"""
     A = []
     for nivel in nivelet:
         x = []
@@ -58,9 +58,9 @@ def MuodostaKerroinmatriisi(nivelet, sauvat, tukivoimat):
 def MuodostaPistekuormaPystyvektori(nivelet):
     """Muodostaa pistekuormista pystyvektorin.
     @param nivelet: ristikon nivelet
-    @type nivelet: list
+    @type nivelet: C{list} of L{Nivel<ristikko.Nivel>}
     @returns: pistekuormista muodostettu kerroinmatriisi
-    @rtype: numpy.array"""
+    @rtype: C{numpy.array}"""
     P = []
     for nivel in nivelet:
         Px = 0.0

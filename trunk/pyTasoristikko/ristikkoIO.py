@@ -44,6 +44,8 @@ Tietokannasta löytyvät seuraavat taulut.
         - YKomp
         - Yksikko
         - Nivel
+
+@todo: Tuille vielä oma taulu
 """
 
 import sqlite3
@@ -57,7 +59,7 @@ def TallennaRistikko(ristikko, tiedostoNimi):
     @param ristikko: Tallennettava ristikko
     @type ristikko: L{Ristikko<pyTasoristikko.ristikko.Ristikko>}
     @param tiedostoNimi: Tallennettavan tiedoston nimi
-    @type tiedostoNimi: string
+    @type tiedostoNimi: C{string}
     """
 
     onkoTiedostoa = os.path.exists(tiedostoNimi)
@@ -142,9 +144,14 @@ def TallennaRistikko(ristikko, tiedostoNimi):
     conn.commit()
     cur.close()
 
-def AvaaRistikko(tiedostoNimi):
+def AvaaRistikko(tiedostoNimi, ristikkoTehdas):
     """
     Avaa ristikon tiedostosta.
+    @todo: tehtävä kokonaan
+    @param tiedostoNimi: Avattavan tiedoston nimi
+    @type tiedostoNimi: C{string}
+    @param ristikkoTehdas: C{Ristikkotehdas}, jolla ristikko luodaan
+    @type ristikkoTehdas: L{Ristikkotehdas<ristikkotehdas.Ristikkotehdas>}
     """
     
     ris = ristikko.Ristikko()
