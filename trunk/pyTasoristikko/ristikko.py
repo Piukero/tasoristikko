@@ -17,6 +17,11 @@
 
 """
 Tästä modulista löytyy kaikki ristikon piirtämistä varten luodut luokat.
+Tarkoitus on, että ainoastan C{Nivel} lisätään ristikkoon. Muut luokat
+lisätään niveleen, joka puolestaan lisää ne ristikkoon. Myös kaikki
+muut operaatiot tehdään C{Nivel}-luokan kautta. Ideana on, että alemman tason
+luokkien operaatiot yksinkertaistuvat, jolloin ei tarvitse miettiä, mistä
+kaikista luokista pitää operaatioita kutsua.
 """
 
 from numpy import sqrt, square, sin, cos, pi, array
@@ -84,7 +89,7 @@ class Nivel(object):
         """Lisää niveleen pistekuorman.
         @param pistekuorma: lisättävä pistekuorma
         @type pistekuorma: L{Pistekuorma<pyTasoristikko.ristikko.Pistekuorma>}"""
-        if not pistekuorma in self.pistekuorma:
+        if not pistekuorma in self.pistekuormat:
             self.pistekuorma.append(pistekuorma)
             self.ristikko.lisaaPistekuorma(pistekuorma)
             
@@ -104,6 +109,37 @@ class Nivel(object):
         @type y: float"""
         self.x = x
         self.y = y
+
+    def poista(self):
+        """Poistaa nivelen ja kaikki niveleen kuuluvat osat ristikosta."""
+        self.ristikko.poistaNivel(self)
+
+    def poistaPistekuorma(self, pistekuorma):
+        """Poistaa nivelestä ja ristikosta pistekuorman.
+        @param pistekuorma: poistettava pistekuorma
+        @type pistekuorma: L{Pistekuorma}"""
+        if pistekuorma in self.pistekuormat:
+            self.pistekuormat.remove(pistekuorma)
+        self.ristikko.poistaPistekuorma(pistekuorma)
+
+    def poistaSauva(self, sauva):
+        """Poistaa nivelestä ja ristikosta sauvan.
+        @param sauva: poistettava sauva
+        @type sauva: L{Sauva}"""
+        if sauva in self.sauvat:
+            self.sauvat.remove(sauva)
+        self.ristikko.poistaSauva(sauva)
+
+    def poistaTuki(self, tuki):
+        """Poistaa nivelestä ja ristikosta tuen.
+        @param tuki: poistettava tuki
+        @type tuki: L{Tuki}"""
+        if tuki in self.tuet:
+            for tv in tuki.tukivoimat:
+                if tv in self.tukivoimat:
+                    self.tukivoimat.remove(tv)
+            self.tuet.remove(tuki)
+        self.ristikko.poistaTuki(tuki)
 
 class Sauva(Voimasuure):
     """Tämä luokka kuvaa ristikon sauvaa."""
@@ -137,9 +173,9 @@ class Sauva(Voimasuure):
         @type nivel2: L{Nivel<pyTasoritikko.ristikko.Nivel>}
         """
         if self.n1:
-            pass
+            self.n1.poistaSauva(self)
         if self.n2:
-            pass
+            self.n2.poistaSauva(self)
         self.n1 = nivel1
         self.n1.lisaaSauva(self)
         self.n2 = nivel2
@@ -165,6 +201,10 @@ class Sauva(Voimasuure):
         ex = (self.n2.x - self.n1.x)/pituus
         ey = (self.n2.y - self.n1.y)/pituus
         return array([ex,ey])
+
+    def poista(self):
+        """Poistaa sauvan."""
+        self.ristikko.poistaSauva(self)
 
 class Tukivoima(Voimasuure):
     """Tämä luokka kuvaa niveleen kohdistuvaa tukivoimaa."""
@@ -215,6 +255,10 @@ class Pistekuorma(object):
         """@ivar: Voiman y-akselin suuntainen komponentti
         @type: C{float}"""
         self.nivel.lisaaPistekuorma(self)
+
+    def poista(self):
+        """Poistaa pistekuorman."""
+        self.nivel.poistaPistekuorma(self)
 
 class Ristikko(object):
     """Tämä luokka kuvaa yksinkertaista tasoristikkoa."""
@@ -291,7 +335,51 @@ class Ristikko(object):
         jos > 0 ja mekanismi jos < 0.
         @return: staattisen määräävyden kertaluku
         @rtype: C{int}"""
-        return 0
+        n = len(self.nivelet)
+        s = len(self.sauvat)
+        t = len(self.tukivoimat)
+        return 2*n - s - t
+
+    def poistaNivel(self, nivel):
+        """Poistaa annetun nivelen ristikosta.
+        @param nivel: poistettava nivel
+        @type nivel: L{Nivel}"""
+        if nivel in self.nivelet:
+            for tuki in nivel.tuet:
+                self.poistaTuki(tuki)
+            for sauva in nivel.sauvat:
+                self.poistaSauva(sauva)
+            for pistekuorma in nivel.pistekuormat:
+                self.poistaPistekuorma(pistekuorma)
+            self.nivelet.remove(nivel)
+        self.ratkaistu = False
+
+    def poistaSauva(self, sauva):
+        """Poistaa annetun sauvan ristikosta.
+        @param sauva: poistettava sauva
+        @type sauva: L{Sauva}"""
+        if sauva in self.sauvat:
+            self.sauvat.remove(sauva)
+        self.ratkaistu = False
+
+    def poistaTuki(self, tuki):
+        """Poistaa annetun tuen ristikosta.
+        @param tuki: poistettava tuki
+        @type tuki: L{Tuki}"""
+        if tuki in self.tuet:
+            for tv in tuki.tukivoimat:
+                if tv in self.tukivoimat:
+                    self.tukivoimat.remove(tv)
+            self.tuet.remove(tuki)
+        self.ratkaistu = False
+
+    def poistaPistekuorma(self, pistekuorma):
+        """Poistaa annetun pistekuorman ristikosta.
+        @param pistekuorma: poistettava pistekuorma
+        @type pistekuorma: L{Pistekuorma}"""
+        if pistekuorma in self.pistekuormat:
+            self.pistekuormat.remove(pistekuorma)
+        self.ratkaistu = False
 
 class Tuki(object):
     """Tämä luokka kuvaa nivleen liitettyä tukea. Yhdessä tuessa voi olla
@@ -332,4 +420,8 @@ class Tuki(object):
             self.tukivoimat.append(Tukivoima(self.nivel,
                                          tKulmat + self.suuntakulma))
         self.nivel.lisaaTuki(self)
+
+    def poista(self):
+        """Poistaa tuen."""
+        self.nivel.poistaTuki(self)
             
