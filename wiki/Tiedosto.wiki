@@ -39,6 +39,7 @@ Tallennettavassa tiedostossa ei ole Tukivoima-taulua vaan tukivoimat luodaan tä
 || _Kentta_ || _Tyyppi_ || _Selite_ ||
 || TukiNro || INTEGER PRIMARY KEY || Tuen numero ||
 || Tyyppi || INTEGER || Tuen tyyppi (0 = niveltuki, 1 = rullatuki) ||
+|| Suuntakulma || REAL || Tuen suuntakulma aseteissa ||
 || SuuruusX || REAL || Tukivoimien resultanttien x-akselin suuntainen komponentti. ||
 || SuuruusY || REAL || Tukivoimien resultanttien y-akselin suuntainen komponentti. ||
 || Yksikko || TEXT || Tukivoimien yksikkö ||
