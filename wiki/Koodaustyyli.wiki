@@ -1,5 +1,5 @@
 #summary Tällä sivulla käsitellään lyhyesti projektin koodaustyyliä.
-#labels Phase-Design
+#labels Phase-Implementation
 
 = Nimeäminen =
 
@@ -33,3 +33,11 @@ Koodissa ei tule käyttää turhaa kommentointia. Se, mitä on tehty, tulee usei
 Jokaisesta paketista, modulista ja funktiosta tulee olla dokumentti jossain. Myös muuttujat on hyvä dokumentoida selkeyden vuoksi, mutta se ei ole tarpeellista. Perittyjen luokkien osalta ei funktioiden dokumentointi ole tarpeen, jos kyseisen funktion dokumentointi löytyy jo jostain.
 
 Dokumentointiin käytetään [http://epydoc.sourceforge.net Epydoc]-ohjelmaa. Ohjelman syntaksi mahdollistaa funktioissa tyyppimäärittelyjen esittämisen ja sitä onkin hyvä käyttää selkeyttämään parametrien ja palautettavien arvojen tyyppejä, jotka eivät oletuksena ole Pythonissa niin selkeitä. 
+
+== Sisennys ==
+
+Sisennykseen käytetään Pythonissa suositun tavan mukaan välilyöntejä eikä tabeja. Tämä helpottaa tiedostojen käsittelyä eri koodausympäristöissä. Yksi sisennys on neljä välilyöntiä. Esimerkiksi vim:ssä tämän saa automaattiseksi asettamalla:
+{{{
+set expandtab
+set shitfwidth=4
+}}}
