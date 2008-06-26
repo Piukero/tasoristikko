@@ -6,12 +6,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+# 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -41,6 +41,18 @@ class Voimasuure(object):
         toteuttaa tämä funktio."""
         pass
 
+    def asetaSuuruus(self, suuruus):
+        """Asettaa voimasuureen suuruuden.
+        @param suuruus: voimasuureen suuruus
+        @type suuruus: C{float}"""
+        self.suuruus = suuruus
+
+    def asetaYksikko(self, yksikko):
+        """Asettaa voimasuureen yksikön.
+        @param yksikko: voimasuureen yksikko
+        @type yksikko: C{string}"""
+        self.yksikko = yksikko
+
 class Nivel(object):
     """Tämä luokka kuvaa ristikon niveltä."""
     def __init__(self, ristikko, x=0.0, y=0.0):
@@ -68,6 +80,9 @@ class Nivel(object):
         self.nimi = ''
         """@ivar: Nivelen nimi
         @type: C{string}"""
+
+        if self.ristikko:
+            self.ristikko.lisaaNivel(self)
 
     def lisaaSauva(self, sauva):
         """Lisää niveleen sauvan.
@@ -384,6 +399,9 @@ class Ristikko(object):
 class Tuki(object):
     """Tämä luokka kuvaa nivleen liitettyä tukea. Yhdessä tuessa voi olla
     useampi tukivoima."""
+
+    TUNTEMATON, NIVELTUKI, RULLATUKI = range(3)
+
     def __init__(self, nivel, suuntakulma=0.0):
         """
         Konstruktori.
@@ -404,6 +422,9 @@ class Tuki(object):
         self.nivel = nivel
         """@ivar: Nivel, johon tuki liittyy
         @type: L{Nivel}"""
+        self.tyyppi = Tuki.TUNTEMATON
+        """@ivar: Nivelen tyyppi
+        @type: C{int}"""
         
     def asetaSuuntakulma(self, suuntakulma):
         """Asettaa tuen ja sen tukivoimien suuntakulman.
@@ -424,4 +445,25 @@ class Tuki(object):
     def poista(self):
         """Poistaa tuen."""
         self.nivel.poistaTuki(self)
-            
+
+    def annaResultantti(self):
+        """Palauttaa tuen tukivoimien muodostaman resultantin. Jos ristikkoa ei
+        ole ratkaistu palauttaa C{(0.0,0.0)}
+        @returns: tukivoimien resultantti.
+        @rtype: C{tuple} of C{float}"""
+        x = 0.0
+        y = 0.0
+        if not ristikko.ratkaistu:
+            return (x, y)
+        for tukivoima in self.tukivoimat:
+            x += cos(tukivoima.suuntakulma*180/pi)*tukivoima.suuruus
+            y += sin(tukivoima.suuntakulma*180/pi)*tukivoima.suuruus
+        return (x, y)
+
+    def asetaSuuruus(self, suuruus, yksikko):
+        """Asettaa tuen tukivoimille suuruudet.
+        @param suuruus: tukivoiman resultantin suuruus
+        @type suuruus: C{float}
+        @param yksikko: tukivoiman yksikko
+        @type yksikko: C{string}"""
+        pass

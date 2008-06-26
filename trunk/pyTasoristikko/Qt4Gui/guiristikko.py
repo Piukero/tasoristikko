@@ -6,12 +6,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -32,9 +32,15 @@ class QNivel(QtGui.QGraphicsItem, Nivel):
     def __init__(self, ristikko, scene, x=0.0, y=0.0):
         QtGui.QGraphicsItem.__init__(self)
         Nivel.__init__(self,ristikko,x,y)
-        self.rect = QtCore.QRectF(-6,-6,12,12) #: Piirettävän alueen QRectF
-        self.pen = NivelPen #: Piirrossa käytettävä QPen
-        self.brush = NivelBrush #: Piirrossa käytettävä brush
+        self.rect = QtCore.QRectF(-6,-6,12,12)
+        """@ivar: Piirettävän alueen C{QRectF}
+        @type: C{QtGui.QRectF}"""
+        self.pen = NivelPen
+        """@ivar: Piirossa käytettävä C{QPen}
+        @type: C{QtGui.QPen}"""
+        self.brush = NivelBrush
+        """@ivar: Piirossa käytettävä C{QBrush}
+        @type: C{QtGui.QBrush}"""
 
     def asetaKoordinaatit(self, x, y):
         Nivel.asetaKoordinaatit(self, x, y)
@@ -53,7 +59,9 @@ class QSauva(QtGui.QGraphicsItem, Sauva):
     def __init__(self, ristikko, nivel1=None, nivel2=None):
         QtGui.QGraphicsItem.__init__(self)
         Sauva.__init__(self, ristikko, nivel1, nivel2)
-        self.pen = QtGui.QPen() #: Piirtämiseen käytettävä QPen
+        self.pen = QtGui.QPen()
+        """@ivar: Piirossa käytettävä C{QPen}
+        @type: C{QtGui.QPen}"""
         self.pen.setWidth(6)
 
     def paint(self, painter, option, widget):
@@ -76,6 +84,8 @@ class QNiveltuki(QtGui.QGraphicsItem, Tuki):
         
         self.tukivoimaKulmat = [0.0, 90.0]
         self.luoTukivoimat()
+
+        self.tyyppi = Tuki.NIVELTUKI
         
 class QRullatuki(QtGui.QGraphicsItem, Tuki):
     """Tämä luokka kuvaa piirettävää rullatukea. Rullatuki on tukevaan
@@ -87,3 +97,5 @@ class QRullatuki(QtGui.QGraphicsItem, Tuki):
         
         self.tukivoimaKulmat = [90.0]
         self.luoTukivoimat()
+
+        self.tyyppi = Tuki.RULLATUKI
