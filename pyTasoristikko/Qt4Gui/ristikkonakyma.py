@@ -6,12 +6,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+# 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -24,14 +24,20 @@ class QRistikkoView(QtGui.QGraphicsView):
     def __init__(self, parent=None):
         QtGui.QGraphicsView.__init__(self, parent)
         
-        self.scene = QRistikkoScene() #: Ristikon skene
+        self.scene = QRistikkoScene()
+        """@ivar: Risitkon scene
+        @type: L{QRistikkoScene}"""
         self.setScene(self.scene)
         self.setRenderHints(QtGui.QPainter.Antialiasing |
                 QtGui.QPainter.SmoothPixmapTransform)
 
-        self.skaalaus = 1 #: Näkymän zoomaus
+        self.skaalaus = 1
+        """@ivar: Näkymän zoomaus
+        @type: C{float}"""
 
-        self.mwPaaikkuna = parent #: Pääikkuna
+        self.mwPaaikkuna = parent
+        """@ivar: Pääikkuna
+        @type: L{QRistikkoMainWindow<mainwindow.QRistikkoMainWindow>}"""
 
         vsb = self.verticalScrollBar()
         vsb.setSliderPosition(vsb.maximum())
@@ -49,10 +55,14 @@ class QRistikkoScene(QtGui.QGraphicsScene):
         QtGui.QGraphicsScene.__init__(self, parent)
         self.setSceneRect(QtCore.QRectF(-40,0,3000,3000))
         
-        #: Siirtomatriisi
         self.siirtoMatriisi = QtGui.QMatrix(1, 0, 0, -1, 0,self.height() - 100)
+        """@ivar: Siirtomatriisi. Tällä käännetään ristikon koordinaatisto.
+        Tällä kerrotaan nivelen koordinaatteja, että saadaan ne oikein päin.
+        @type: C{QtGui.QMatrix}"""
 
-        self.ruudukkoPaalla = True #: Onko taustaruudukko päällä
+        self.ruudukkoPaalla = True 
+        """@ivar: Onko taustaruudukko päällä
+        @type: C{bool}"""
 
     def drawBackground(self, painter, rect):
         # Ristikko
@@ -132,14 +142,18 @@ class QNivelKoordinaattiWidget(QtGui.QGraphicsWidget):
         lM1 = QtGui.QLabel('m')
         lM2 = QtGui.QLabel('m')
 
-        self.nivel = nivel #: Nivel, johon tämä ikkuna liittyy
+        self.nivel = nivel
+        """@ivar: Nivel, johon tämä ikkuna liittyy
+        @type: L{QNivel<guiristikko.QNivel>}"""
 
-        #: x-koordinaatin QLineEdit
         self.lineEditX = QtGui.QLineEdit('%.2f' % self.nivel.x)
+        """@ivar: x-koordinaatin C{QLineEdit}
+        @type: C{QtGui.QLineEdit}"""
         self.lineEditX.setFixedWidth(50)
         self.lineEditX.setAlignment(QtCore.Qt.AlignRight)
-        #: y-koordiaatin QLineEdit
         self.lineEditY = QtGui.QLineEdit('%.2f' % self.nivel.y)
+        """@ivar: y-koordinaatin C{QLineEdit}
+        @type: C{QtGui.QLineEdit}"""
         self.lineEditY.setFixedWidth(50)
         self.lineEditY.setAlignment(QtCore.Qt.AlignRight)
         self.connect(self.lineEditX, QtCore.SIGNAL('returnPressed()'),
@@ -173,10 +187,10 @@ class QNivelKoordinaattiWidget(QtGui.QGraphicsWidget):
         self.nivel.asetaKoordinaatit(x, y)
 
     def showEvent(self, event):
+        """@todo: asetetaan ikkunnalle focus"""
         self.setPos(self.nivel.pos() + QtCore.QPointF(6, -6))
         self.lineEditX.setText('%.2f' % self.nivel.x)
         self.lineEditY.setText('%.2f' % self.nivel.y)
-        #TODO: asetetaan tälle focus
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
