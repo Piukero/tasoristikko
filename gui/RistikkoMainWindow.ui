@@ -57,11 +57,14 @@
      </property>
      <addaction name="actionTiedostoTB" />
      <addaction name="actionNaytaTB" />
+     <addaction name="actionTyokalutTB" />
     </widget>
     <addaction name="actionLahenna" />
     <addaction name="actionLoitonna" />
     <addaction name="separator" />
     <addaction name="actionRuudukko" />
+    <addaction name="actionKoordinaattiakselit" />
+    <addaction name="separator" />
     <addaction name="menuTyokalupalkit" />
    </widget>
    <addaction name="menuTiedosto" />
@@ -105,7 +108,7 @@
     <rect>
      <x>135</x>
      <y>22</y>
-     <width>865</width>
+     <width>186</width>
      <height>24</height>
     </rect>
    </property>
@@ -122,6 +125,31 @@
    <addaction name="actionLoitonna" />
    <addaction name="separator" />
    <addaction name="actionRuudukko" />
+  </widget>
+  <widget class="QToolBar" name="toolBarTyokalut" >
+   <property name="geometry" >
+    <rect>
+     <x>321</x>
+     <y>22</y>
+     <width>679</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="windowTitle" >
+    <string>Työkalut</string>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionValinta" />
+   <addaction name="actionNivel" />
+   <addaction name="actionSauva" />
+   <addaction name="actionPistekuorma" />
+   <addaction name="actionNiveltuki" />
+   <addaction name="actionRullatuki" />
   </widget>
   <action name="actionSulje" >
    <property name="text" >
@@ -224,6 +252,76 @@
     <string>Tiedosto</string>
    </property>
   </action>
+  <action name="actionKoordinaattiakselit" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Koordinaattiakselit</string>
+   </property>
+  </action>
+  <action name="actionValinta" >
+   <property name="text" >
+    <string>Valinta</string>
+   </property>
+   <property name="toolTip" >
+    <string>Valintatyökalu</string>
+   </property>
+  </action>
+  <action name="actionNivel" >
+   <property name="text" >
+    <string>Nivel</string>
+   </property>
+   <property name="toolTip" >
+    <string>Lisää nivel</string>
+   </property>
+  </action>
+  <action name="actionSauva" >
+   <property name="text" >
+    <string>Sauva</string>
+   </property>
+   <property name="toolTip" >
+    <string>Lisää sauva</string>
+   </property>
+  </action>
+  <action name="actionPistekuorma" >
+   <property name="text" >
+    <string>Pistekuorma</string>
+   </property>
+   <property name="toolTip" >
+    <string>Lisää pistekuorma</string>
+   </property>
+  </action>
+  <action name="actionNiveltuki" >
+   <property name="text" >
+    <string>Niveltuki</string>
+   </property>
+   <property name="toolTip" >
+    <string>Lisää niveltuki</string>
+   </property>
+  </action>
+  <action name="actionRullatuki" >
+   <property name="text" >
+    <string>Rullatuki</string>
+   </property>
+   <property name="toolTip" >
+    <string>Lisää rullatuki</string>
+   </property>
+  </action>
+  <action name="actionTyokalutTB" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Työkalut</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -271,6 +369,22 @@
     </hint>
     <hint type="destinationlabel" >
      <x>67</x>
+     <y>33</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionTyokalutTB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>toolBarTyokalut</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>660</x>
      <y>33</y>
     </hint>
    </hints>
