@@ -52,12 +52,15 @@ class Ristikkotehdas(object):
         @type nivel2: L{Nivel<pyTasoristikko.ristikko.Nivel>}"""
         pass
 
-    def luoTuki(self, nivel, suuntakulmat):
+    def luoTuki(self, nivel, tyyppi, suuntakulma):
         """Luo ristikkoon tuen. Alaluokat toteuttavat.
         @param nivel: nivel, johon tukivoima kohdistuu
         @type nivel: L{Nivel<pyTasoristikko.ristikko.Nivel>}
-        @param suuntakulmat: tuen tukivoimien suuntakulmat
-        @type suuntakulmat: list"""
+        @param tyyppi: Nivelen tyyppi
+        @type tyyppi: L{ristikko.Tuki.NIVELTUKI} tai L{ristikko.Tuki.RULLATUKI}
+        @param suuntakulma: tuen suuntakulma
+        @type suuntakulma: C{float}
+        @raise RistikkoIOVirhe: Jos annettu tyyppi on tuntematon."""
         pass
 
     def luoPistekuorma(self, nivel, kompX, kompY):

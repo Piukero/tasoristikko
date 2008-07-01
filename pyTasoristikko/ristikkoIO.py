@@ -162,3 +162,18 @@ def AvaaAsetukset(tiedostoNimi):
     Avaa tiedostosta mahdollisen gui:n asetukset.
     """
     pass
+
+
+def LuoTestiRistikko(ristikkoTehdas):
+    """Luo yksinkertaisen testiristikon ristikkotehtaan avulla.
+    @param ristikkoTehdas: käytettävä ristikkotehdas
+    @type ristikkoTehdas: L{Ristikkotehdas<ristikkotehdas.Ristikkotehdas>}"""
+
+    rt = ristikkoTehdas
+    n1 = rt.luoNivel(1.0, 1.0)
+    n2 = rt.luoNivel(4.0, 1.0)
+    n3 = rt.luoNivel(1.0, 4.0)
+
+    rt.luoSauva(n1, n2)
+    rt.luoSauva(n2, n3)
+    rt.luoSauva(n3, n1)

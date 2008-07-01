@@ -6,24 +6,23 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-u"""pyTasoristikko-paketti on Tasoristikko-ohjelman API."""
+"""Tässä modulissa on ohjelman omat poikkeukset."""
 
-__all__ = [ 'ristikko', 'ratkaisija', 'ristikkoIO', 'ristikkotehdas',
-            'ristikkopoikkeukset']
+class RistikkoIOVirhe(Exception):
+    """Luokka, joka kuvaa ristikon IO-operaatioissa tapahtunutta virhettä."""
+    def __init__(self, virhe):
+        """@param virhe: tapahtunut virhe
+        @type virhe: C{string}"""
+        self.virhe = virhe
 
-__author__ = 'Ville Leskinen'
-
-__version__ = "0.0.1"
-
-__url__ = 'http://code.google.com/p/tasoristikko/'
-
-__license__ = 'GPL-v3'
+    def __str__(self):
+        return 'Virhe ristikon IO-operaatiossa: %s' % self.virhe
