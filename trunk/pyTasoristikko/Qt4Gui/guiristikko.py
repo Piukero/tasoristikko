@@ -41,14 +41,27 @@ class QNivel(QtGui.QGraphicsItem, Nivel):
         self.brush = NivelBrush
         """@ivar: Piirossa käytettävä C{QBrush}
         @type: C{QtGui.QBrush}"""
+        self.scene = scene
+        """@ivar: Scene johon tämä nivel kuuluu.
+        @type: L{QRistikkoScene<ristikkonakyma.QRistikkoScene>}"""
+        self.setZValue(100)
+
+        self.asetaKoordinaatit(x, y)
+
+        self.setFlags(QtGui.QGraphicsItem.ItemIsMovable |
+                      QtGui.QGraphicsItem.ItemIsSelectable |
+                      QtGui.QGraphicsItem.ItemIsFocusable)
 
     def asetaKoordinaatit(self, x, y):
         Nivel.asetaKoordinaatit(self, x, y)
-        self.setPos(x,y)
+        
+        pos = QtCore.QPointF(x*100, y*100)
+        pos = self.scene.siirtoMatriisi.map(pos)
+        self.setPos(pos)
     
     def paint(self, painter, option, widget=None):
         painter.setPen(self.pen)
-        painter.serBrush(self.brush)
+        painter.setBrush(self.brush)
         painter.drawEllipse(self.rect)
     
     def boundingRect(self):
@@ -63,17 +76,34 @@ class QSauva(QtGui.QGraphicsItem, Sauva):
         """@ivar: Piirossa käytettävä C{QPen}
         @type: C{QtGui.QPen}"""
         self.pen.setWidth(6)
+        self.setFlags(QtGui.QGraphicsItem.ItemIsMovable |
+                      QtGui.QGraphicsItem.ItemIsSelectable |
+                      QtGui.QGraphicsItem.ItemIsFocusable)
+
 
     def paint(self, painter, option, widget):
         painter.setPen(self.pen)
         painter.drawLine(QtCore.QLineF(self.n1.pos(), self.n2.pos()))
+
+    def boundingRect(self):
+        penWidth = self.pen.width()
+        extra = penWidth / 2
+
+        return QtCore.QRectF(self.n1.pos(),
+                QtCore.QSizeF(self.n2.pos().x() - self.n1.pos().x(),
+                              self.n2.pos().y() -
+                              self.n1.pos().y())).normalized().adjusted(-extra,
+                                      -extra, extra, extra)
 
 class QPistekuorma(QtGui.QGraphicsItem, Pistekuorma):
     """Tämä luokka kuvaa piirettävää pistekuormaa."""
     def __init__(self, nivel, kuormaX, kuormaY):
         QtGui.QGraphicsItem.__init__(self)
         Pistekuorma.__init__(self, nivel, kuormaX, kuormaY)
-        
+        self.setFlags(QtGui.QGraphicsItem.ItemIsMovable |
+                      QtGui.QGraphicsItem.ItemIsSelectable |
+                      QtGui.QGraphicsItem.ItemIsFocusable)
+       
 class QNiveltuki(QtGui.QGraphicsItem, Tuki):
     """Tämä luokka kuvaa piirettävää niveltukea. Niveltuki on tukevaan
     pintaan jäykästi kiinitetty tuki."""
@@ -86,6 +116,9 @@ class QNiveltuki(QtGui.QGraphicsItem, Tuki):
         self.luoTukivoimat()
 
         self.tyyppi = Tuki.NIVELTUKI
+        self.setFlags(QtGui.QGraphicsItem.ItemIsMovable |
+                      QtGui.QGraphicsItem.ItemIsSelectable |
+                      QtGui.QGraphicsItem.ItemIsFocusable)
         
 class QRullatuki(QtGui.QGraphicsItem, Tuki):
     """Tämä luokka kuvaa piirettävää rullatukea. Rullatuki on tukevaan
@@ -99,3 +132,6 @@ class QRullatuki(QtGui.QGraphicsItem, Tuki):
         self.luoTukivoimat()
 
         self.tyyppi = Tuki.RULLATUKI
+        self.setFlags(QtGui.QGraphicsItem.ItemIsMovable |
+                      QtGui.QGraphicsItem.ItemIsSelectable |
+                      QtGui.QGraphicsItem.ItemIsFocusable)

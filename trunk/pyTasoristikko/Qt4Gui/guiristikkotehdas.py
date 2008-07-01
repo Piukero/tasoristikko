@@ -19,6 +19,7 @@
 graafisessa käyttöliittymässä käytettävä ristikko."""
 
 from pyTasoristikko.ristikkotehdas import Ristikkotehdas
+from pyTasoristikko.ristikkopoikkeukset import *
 from guiristikko import *
 
 class GuiRistikkotehdas(Ristikkotehdas):
@@ -35,20 +36,20 @@ class GuiRistikkotehdas(Ristikkotehdas):
         """@ivar: Scene johon ristikko lisätään
         @type: L{QRistikkoScene<ristikkonakyma.QRistikkoScene>}"""
 
-    def luoNivel(self, x, y, nimi):
+    def luoNivel(self, x, y):
         nivel = QNivel(self.ristikko, self.scene, x, y)
         return nivel
 
-    def luoSauva(self, nivel1, nivel2, nimi):
+    def luoSauva(self, nivel1, nivel2):
         sauva = QSauva(self.ristikko, nivel1, nivel2)
 
     def luoPistekuorma(self, nivel, kompX, kompY):
         pistekuorma = QPistekuorma(nivel, kompX, kompY)
 
-    def luoTuki(self, nivel, suuntakulmat):
-        """@todo: tarkistukset ja kulman laskenta."""
-        if len(suuntakulmat) == 1:
-            kulma = suuntakulmat[0] - 90.0
-            tuki = QRullatuki(nivel, kulma)
+    def luoTuki(self, nivel, tyyppi, suuntakulma):
+        if tyyppi == Tuki.NIVELTUKI:
+            tuki = QNiveltuki(nivel, suuntakulma)
+        elif tyyppi == Tuki.RULLATUKI:
+            tuki = QRullatuki(nivel, suuntakulma)
         else:
-            tuki = QNiveltuki(nivel)
+            raise RistikkoIOVirhe, 'Tuntematon tyyppi %i' % tyyppi

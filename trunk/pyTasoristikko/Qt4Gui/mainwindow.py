@@ -20,6 +20,9 @@
 from PyQt4 import QtCore, QtGui
 from ui_ristikkomainwindow import Ui_RistikkoMainWindow
 from ristikkonakyma import QRistikkoView
+from guiristikkotehdas import GuiRistikkotehdas
+from pyTasoristikko.ristikko import Ristikko
+from pyTasoristikko.ristikkoIO import *
 
 class QRistikkoMainWindow(QtGui.QMainWindow, Ui_RistikkoMainWindow):
     """Tasoristikko-ohjelman pääikkuna."""
@@ -37,6 +40,15 @@ class QRistikkoMainWindow(QtGui.QMainWindow, Ui_RistikkoMainWindow):
         self.setCentralWidget(cw)
         
         self.generateConnections()
+
+        self._teeTestiRistikko()
+    
+    def _teeTestiRistikko(self):
+        """Luodaan käyttöliittymään testiristikko."""
+        ristikko = Ristikko()
+        tehdas = GuiRistikkotehdas(self.gwRistikko.scene, ristikko)
+        LuoTestiRistikko(tehdas)
+        self.gwRistikko.scene.lisaaRistikko(ristikko)
 
     def generateConnections(self):
         """Luo actioneille connectionit"""

@@ -23,9 +23,10 @@ from distutils.cmd import Command
 from distutils.errors import *
 
 import sys
+import os
 
 class build_doc(Command):
-    description = 'Luodaan dokumentaatio.'
+    description = 'Luo dokumentaation'
     user_options = []
 
     def initialize_options(self):
@@ -47,6 +48,41 @@ class build_doc(Command):
         except ImportError:
             print 'epydoc ei asennettuna, ei tehdä dokumentaatiota'
 
+class build_gui(Command):
+    description = u'Luo graafisen käyttöliittymään tarvittavat luokat'
+    user_options = []
+
+    def initialize_options(self):
+        self.pyNimet = [
+                'ui_mainwindow.py'
+                ]
+
+        self.uiNimet = [
+                'RistikkoMainWindow.ui'
+                ]
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        try:
+            from PyQt4 import uic
+
+            pyPath = os.path.join('pyTasoristikko', 'Qt4Gui')
+            uiPath = os.path.join('gui')
+
+            for pyNimi, uiNimi in zip(self.pyNimet,
+                    self.uiNimet):
+
+                pyTiedosto = open(os.path.join(pyPath, pyNimi), 'w')
+                uiTiedosto = open(os.path.join(uiPath, uiNimi), 'r')
+                uic.compileUi(uiTiedosto, pyTiedosto)
+
+        except ImportError:
+            print u'Käyttöliittymää ei voida luoda. PyQt4 tai sen kehitys-' + \
+                   'paketti ei ole asennettuna.'
+
+
 setup(name = 'tasoristikko',
       description = 'Tasoristikkoja ratkaiseva ohjelma.',
       version = pyTasoristikko.__version__,
@@ -57,5 +93,6 @@ setup(name = 'tasoristikko',
       scripts = ['tasoristikko'],
       packages = ['pyTasoristikko', 'pyTasoristikko.Qt4Gui'],
       cmdclass = {
-          'build_doc': build_doc
+          'build_doc': build_doc,
+          'build_gui': build_gui
           })

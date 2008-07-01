@@ -64,6 +64,10 @@ class QRistikkoScene(QtGui.QGraphicsScene):
         """@ivar: Onko taustaruudukko päällä
         @type: C{bool}"""
 
+        self.koordinaattiKerroin = 100
+        """@ivar: Koordinaattien kerroin
+        @type: C{int}"""
+
     def drawBackground(self, painter, rect):
         # Ristikko
         if self.ruudukkoPaalla:
