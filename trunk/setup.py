@@ -79,8 +79,8 @@ class build_gui(Command):
                 uic.compileUi(uiTiedosto, pyTiedosto)
 
         except ImportError:
-            print u'Käyttöliittymää ei voida luoda. PyQt4 tai sen kehitys-' + \
-                   'paketti ei ole asennettuna.'
+            print 'Ei voida suorittaa. PyQt4 tai sen kehitys-paketti ei ole '+\
+                  'asennettuna.'
 
 
 setup(name = 'tasoristikko',
