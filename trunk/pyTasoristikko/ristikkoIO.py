@@ -18,32 +18,9 @@
 """
 Tässä modulista on kaikki tarvittavat ristikon tiedostosta lukemista ja
 tiedostoon tallettamista varten tehdyt funktiot. Talennettu tiedosto on yksinkertaisesti sqlite3:lla muodostettu tietokanta.
-Tietokannasta löytyvät seuraavat taulut.
 
-    - Nivel
-        - NivelNro
-        - Nimi
-        - x
-        - y
-    - Sauva
-        - SauvaNro
-        - Nimi
-        - Suuruus
-        - Yksikko
-        - Nivel1
-        - Nivel2
-    - Tukivoima
-        - TukvoimaNro
-        - Suuruus
-        - Yksikko
-        - Suuntakulma
-        - Nivel
-    - Pistekuorma
-        - PistekuormaNro
-        - XKomp
-        - YKomp
-        - Yksikko
-        - Nivel
+Tietokannan taulut on esitetty tarkemmin projektin wiki-sivulla 
+U{Tiedosto<http://code.google.com/p/tasoristikko/wiki/Tiedosto>}.
 
 @todo: Tuille vielä oma taulu
 """

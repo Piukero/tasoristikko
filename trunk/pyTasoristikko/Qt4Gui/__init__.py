@@ -17,4 +17,5 @@
 
 """Tässä paketissa ovat kaikki graafisen käyttöliittymän luokat."""
 
-__all__ = [ 'mainwindow', 'ristikkonakyma', 'guiristikko' ]
+__all__ = [ 'mainwindow', 'ristikkonakyma', 'guiristikko', 'guiristikkotehdas',
+        'ristikkowidgetit']
