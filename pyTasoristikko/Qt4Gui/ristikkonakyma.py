@@ -19,6 +19,8 @@
 
 from PyQt4 import QtCore, QtGui
 
+from ristikkowidgetit import QAsetusWidget
+
 class QRistikkoView(QtGui.QGraphicsView):
     """Ristikon näyttävä QGraphicsView"""
     def __init__(self, parent=None):
@@ -67,6 +69,10 @@ class QRistikkoScene(QtGui.QGraphicsScene):
         self.koordinaattiKerroin = 100
         """@ivar: Koordinaattien kerroin
         @type: C{int}"""
+
+        self.widgetit = []
+        """@ivar: skenen widgetit
+        @type: C{list} of L{QAsetusWidget}"""
 
     def drawBackground(self, painter, rect):
         # Ristikko
@@ -123,84 +129,19 @@ class QRistikkoScene(QtGui.QGraphicsScene):
         @param ristikko: lisättävä ristikko
         @type ristikko: L{Ristikko<pyTasoristikko.ristikko.Ristikko>}"""
         self.ristikko = ristikko #: Sceneen kuuluva ristikko
-        for nivel in ristikko.nivelet:
-            self.addItem(nivel)
-        for sauva in ristikko.sauvat:
-            self.addItem(sauva)
-        for tuki in ristikko.tuet:
-            self.addItem(tuki)
-        for pistekuorma in ristikko.pistekuormat:
-            self.addItem(pistekuorma)
 
-class QNivelKoordinaattiWidget(QtGui.QGraphicsWidget):
-    """Tämä luokka kuvaa nivelen viereen luotavaa koordinaatti-ikkunaa."""
-    def __init__(self, scene, nivel, parent=None, wFlags=0):
-        QtGui.QGraphicsWidget.__init__(self, parent)
+    def lisaaWidget(self, widget):
+        """Lisää sekeneen widgetin.
+        @param widget: lisättävä widget
+        @type widget: L{QAsetusWidget}"""
+        if not widget in self.widgetit:
+            self.widgetit.append(widget)
+            self.addItem(widget)
 
-        frame = QtGui.QFrame()
-        frame.setFrameShadow(QtGui.QFrame.Plain)
-        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-
-        lX = QtGui.QLabel('x:')
-        lY = QtGui.QLabel('y:')
-        lM1 = QtGui.QLabel('m')
-        lM2 = QtGui.QLabel('m')
-
-        self.nivel = nivel
-        """@ivar: Nivel, johon tämä ikkuna liittyy
-        @type: L{QNivel<guiristikko.QNivel>}"""
-
-        self.lineEditX = QtGui.QLineEdit('%.2f' % self.nivel.x)
-        """@ivar: x-koordinaatin C{QLineEdit}
-        @type: C{QtGui.QLineEdit}"""
-        self.lineEditX.setFixedWidth(50)
-        self.lineEditX.setAlignment(QtCore.Qt.AlignRight)
-        self.lineEditY = QtGui.QLineEdit('%.2f' % self.nivel.y)
-        """@ivar: y-koordinaatin C{QLineEdit}
-        @type: C{QtGui.QLineEdit}"""
-        self.lineEditY.setFixedWidth(50)
-        self.lineEditY.setAlignment(QtCore.Qt.AlignRight)
-        self.connect(self.lineEditX, QtCore.SIGNAL('returnPressed()'),
-                self.vaihdaKoordinaatit)
-        self.connect(self.lineEditY, QtCore.SIGNAL('returnPressed()'),
-                self.vaihdaKoordinaatit)
-        
-        gl = QtGui.QGridLayout()
-        gl.addWidget(lX, 0, 0)
-        gl.addWidget(self.lineEditX, 0, 1)
-        gl.addWidget(lM1, 0, 2)
-        gl.addWidget(lY, 1, 0)
-        gl.addWidget(self.lineEditY, 1, 1)
-        gl.addWidget(lM2, 1, 2)
-
-        frame.setLayout(gl)
-
-        layout = QtGui.QGraphicsLinearLayout()
-        layout.addItem(scene.addWidget(frame))
-        self.setLayout(layout)
-
-        self.setPos(self.nivel.pos() + QtCore.QPointF(6,-6))
-
-        self.setZValue(100.0)
-
-    def vaihdaKoordinaatit(self):
-        """Vaihtaa nivelen koordinaatit ja piilottaa itsensä."""
-        x = float(self.lineEditX.text())
-        y = float(self.lineEditY.text())
-        self.setVisible(False)
-        self.nivel.asetaKoordinaatit(x, y)
-
-    def showEvent(self, event):
-        """@todo: asetetaan ikkunnalle focus"""
-        self.setPos(self.nivel.pos() + QtCore.QPointF(6, -6))
-        self.lineEditX.setText('%.2f' % self.nivel.x)
-        self.lineEditY.setText('%.2f' % self.nivel.y)
-
-    def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Escape:
-            self.setVisible(False)
-        elif event.key() == QtCore.Qt.Key_Return:
-            self.vaihdaKoordinaatit()
-        else:
-            QtGui.QGraphicsWidget.keyPressEvent(self, event)
-
+    def piilotaMuutWidgetit(self, widget):
+        """Piilottaa scenen muut widgetit paitsi annetun.
+        @param widget: Widgetti, jota ei piiloteta.
+        @type widget: L{QAsetusWidget}"""
+        for item in self.widgetit:
+            if isinstance(item, QAsetusWidget) and not item == widget:
+                item.hide()

@@ -54,7 +54,7 @@ class build_gui(Command):
 
     def initialize_options(self):
         self.pyNimet = [
-                'ui_mainwindow.py'
+                'ui_ristikkomainwindow.py'
                 ]
 
         self.uiNimet = [
@@ -73,6 +73,7 @@ class build_gui(Command):
 
             for pyNimi, uiNimi in zip(self.pyNimet,
                     self.uiNimet):
+                print 'Luodaan tiedosto: %s' % pyNimi
 
                 pyTiedosto = open(os.path.join(pyPath, pyNimi), 'w')
                 uiTiedosto = open(os.path.join(uiPath, uiNimi), 'r')
