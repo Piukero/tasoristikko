@@ -26,6 +26,12 @@ kaikista luokista pitää operaatioita kutsua.
 
 from numpy import sqrt, square, sin, cos, pi, array
 
+YKSIKOT = [ 'N', 'kN', 'MN' ] #: Voimissa käytettävät yksiköt
+YKSIKKOKERTOIMET = { 'N' : 1,
+                     'kN': 1000,
+                     'MN': 1000000 } #: Yksikköjen kertoimet
+
+
 class Voimasuure(object):
     """Tämä luokka kuvaa yksinkertaista skalaarista voimasuuretta."""
     def __init__(self, suuruus=0.0, yksikko=''):
@@ -105,7 +111,7 @@ class Nivel(object):
         @param pistekuorma: lisättävä pistekuorma
         @type pistekuorma: L{Pistekuorma<pyTasoristikko.ristikko.Pistekuorma>}"""
         if not pistekuorma in self.pistekuormat:
-            self.pistekuorma.append(pistekuorma)
+            self.pistekuormat.append(pistekuorma)
             self.ristikko.lisaaPistekuorma(pistekuorma)
             
     def lisaaTuki(self, tuki):
