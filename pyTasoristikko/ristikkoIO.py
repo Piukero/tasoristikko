@@ -150,7 +150,12 @@ def LuoTestiRistikko(ristikkoTehdas):
     n1 = rt.luoNivel(1.0, 1.0)
     n2 = rt.luoNivel(4.0, 1.0)
     n3 = rt.luoNivel(1.0, 4.0)
+    n4 = rt.luoNivel(4.0, 4.0)
 
     rt.luoSauva(n1, n2)
     rt.luoSauva(n2, n3)
     rt.luoSauva(n3, n1)
+    rt.luoSauva(n2, n4)
+    rt.luoSauva(n3, n4)
+
+    rt.luoPistekuorma(n4, 0.0, -1.0)

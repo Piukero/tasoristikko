@@ -22,6 +22,7 @@ from PyQt4 import QtCore, QtGui
 
 from pyTasoristikko.ristikko import *
 from ristikkowidgetit import *
+from valintaitemit import *
 
 
 class QRistikkoItem(QtGui.QGraphicsItem):
@@ -33,14 +34,57 @@ class QRistikkoItem(QtGui.QGraphicsItem):
         self.asetukset = None
         """@ivar: Asetuksiin käytettävä widget. Alaluokan tulee luoda tämä.
         @type: L{QAsetusWidget}"""
+        self.valinta = None
+        """@ivar: Itemin valintaa kuvaava C{QValintaItem}. Alaluokan tulee luoda
+        tämä.
+        @type: L{QValintaItem}"""
+        self.menu = QtGui.QMenu()
+        """@ivar: Itemin kontekstimenu
+        @type: C{QtGui.QMenu}"""
+
+        self.luoMenuActionit()
 
     def mouseDoubleClickEvent(self, event):
         self.asetukset.asetaKlikkausPos(event.pos())
         self.asetukset.show()
 
     def keyPressEvent(self, event):
-       if event.key == QtCore.Qt.Key_Delete:
+        if event.key == QtCore.Qt.Key_Delete:
            self.poista()
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.scene().valitseItem(self)
+
+    def setSelected(self, selected):
+        if self.valinta:
+            self.valinta.setVisible(selected)
+        QtGui.QGraphicsItem.setSelected(self, selected)
+
+    def luoMenuActionit(self):
+        """Luo kontekstimenulle actionit. Alaluokka voi overideta, jos tarvitaan
+        omia actioneja."""
+        self.poistaAction = QtGui.QAction('Poista', self.menu)
+        """@ivar: Menun 'poista'-action
+        @type: C{QtGui.QAction}"""
+        self.menu.addAction(self.poistaAction)
+        QtCore.QObject.connect(self.poistaAction, QtCore.SIGNAL('triggered()'),
+                    self.poista)
+
+        self.asetuksetAction = QtGui.QAction('Asetukset', self.menu)
+        """@ivar: Menun action, joka näytää asetuswidgetin.
+        @type: C{QtGui.QAction}"""
+        self.menu.addAction(self.asetuksetAction)
+        QtCore.QObject.connect(self.asetuksetAction, QtCore.SIGNAL('triggered()'),
+                self._naytaAsetukset)
+
+    def contextMenuEvent(self, event):
+        self.asetukset.asetaKlikkausPos(event.pos())
+        self.menu.exec_(event.screenPos())
+
+    def _naytaAsetukset(self):
+        """Kutsuu asetuswidgetin show():ta."""
+        self.asetukset.show()
 
 class QNivel(QRistikkoItem, Nivel):
     """Tämä luokka kuvaa piirettävää niveltä."""
@@ -64,17 +108,20 @@ class QNivel(QRistikkoItem, Nivel):
         self.brush = QNivel.NivelBrush
         """@ivar: Piirossa käytettävä C{QBrush}
         @type: C{QtGui.QBrush}"""
-        #self.scene = scene
-        #"""@ivar: Scene johon tämä nivel kuuluu.
-        #@type: L{QRistikkoScene<ristikkonakyma.QRistikkoScene>}"""
+
         self.setZValue(100)
 
         self.setFlags(QtGui.QGraphicsItem.ItemIsMovable |
                       QtGui.QGraphicsItem.ItemIsSelectable |
                       QtGui.QGraphicsItem.ItemIsFocusable)
 
+        self.setCursor(QtCore.Qt.ClosedHandCursor)
+
         scene.addItem(self)
         self.asetukset = QNivelWidget(self.scene(), self)
+
+        self.valinta = QNivelValinta(self)
+
         self.asetaKoordinaatit(x, y)
         self.alustettu = True
 
@@ -117,10 +164,10 @@ class QNivel(QRistikkoItem, Nivel):
 
     def poista(self):
         Nivel.poista(self)
-        self.scene().removeItem(self)
         self.scene().removeItem(self.asetukset)
         for sauva in self.sauvat:
             self.scene().removeItem(sauva)
+        self.scene().removeItem(self)
 
     def lisaaSauva(self, sauva):
         """@type sauva: L{QSauva}"""
@@ -131,9 +178,9 @@ class QNivel(QRistikkoItem, Nivel):
     def lisaaPistekuorma(self, pistekuorma):
         """@type pistekuorma: L{QPistekuorma}"""
         Nivel.lisaaPistekuorma(self, pistekuorma)
+        pistekuorma.setParentItem(self)
         if not pistekuorma in self.scene().items():
             self.scene().addItem(pistekuorma)
-        pistekuorma.setParent(self)
 
 
 class QSauva(QRistikkoItem, Sauva):
@@ -149,6 +196,7 @@ class QSauva(QRistikkoItem, Sauva):
                       QtGui.QGraphicsItem.ItemIsFocusable)
 
         self.asetukset = QSauvaWidget(self.n1.scene(), self)
+        self.valinta = QSauvaValinta(self)
 
 
     def paint(self, painter, option, widget):
@@ -173,6 +221,26 @@ class QPistekuorma(QRistikkoItem, Pistekuorma):
         self.setFlags(QtGui.QGraphicsItem.ItemIsMovable |
                       QtGui.QGraphicsItem.ItemIsSelectable |
                       QtGui.QGraphicsItem.ItemIsFocusable)
+
+        self.pen = QtGui.QPen(QtCore.Qt.black)
+        """@ivar: Nuolen piirtämiseen käytettävä C{QPen}
+        @type: C{QtGui.QPen}"""
+        self.pen.setWidth(3)
+
+        self.valinta = QPistekuormaValinta(self)
+        self.asetukset = QPistekuormaWidget(self.nivel.scene(), self)
+
+        self.setCursor(QtCore.Qt.ClosedHandCursor)
+
+    def paint(self, painter, option, widget):
+        painter.setPen(self.pen)
+        painter.drawLine(0, -50, 0, -10)
+        painter.drawLine(0, -10, 5, -20)
+        painter.drawLine(0, -10, -5, -20)
+
+    def boundingRect(self):
+        return QtCore.QRectF(-5, -10, 10, -40)
+
        
 class QNiveltuki(QRistikkoItem, Tuki):
     """Tämä luokka kuvaa piirettävää niveltukea. Niveltuki on tukevaan

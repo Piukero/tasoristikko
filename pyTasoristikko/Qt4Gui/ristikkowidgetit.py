@@ -19,6 +19,7 @@
 
 from PyQt4 import QtCore, QtGui
 
+from pyTasoristikko import ristikko
 
 class QAsetusWidget(QtGui.QGraphicsWidget):
     """Tämä luokka kuvaa perus asetus widgetiä. Ei tee vielä juuri mitään."""
@@ -164,4 +165,43 @@ class QSauvaWidget(QAsetusWidget):
         self.setPos(self.klikkausPos)
         self.lineEditNimi.setText(self.sauva.nimi)
         QAsetusWidget.showEvent(self, event)
-        
+
+class QPistekuormaWidget(QAsetusWidget):
+    """Tämä luokka kuvaa pistekuorman asetuswidgettiä."""
+    def __init__(self, scene, pistekuorma, parent=None, wFlags=0):
+        QAsetusWidget.__init__(self, scene, parent, wFlags)
+
+        self.pistekuorma = pistekuorma
+        """@ivar: Pistekuorma, johon tämä widget kuuluu
+        @type: L{QPistekuorma}"""
+
+        self.sbSuuntakulma = QtGui.QSpinBox()
+        """@ivar: Suuntakulman C{QSpinBox}
+        @type: C{QtGui.QSpinBox}"""
+        self.sbSuuntakulma.setRange(0, 359)
+        self.sbSuuntakulma.setSuffix(u'\N{DEGREE SIGN}')
+
+        self.leVoimaresultantti = QtGui.QLineEdit()
+        """@ivar: Voiman resultantin C{QLineEdit}
+        @type: C{QtGui.QLineEdit}"""
+
+        self.cbYksikko = QtGui.QComboBox()
+        """@ivar: Yksikön C{QComboBox}
+        @type: C{QtGui.QComboBox}"""
+        for yksikko in ristikko.YKSIKOT:
+            self.cbYksikko.addItem(yksikko)
+
+        gl = QtGui.QGridLayout()
+        iY = 0
+        gl.addWidget(QtGui.QLabel('Suuntakulma:'), iY, 0)
+        gl.addWidget(self.sbSuuntakulma, iY, 1)
+        iY += 1
+        gl.addWidget(QtGui.QLabel('Suuruus:'), iY, 0)
+        gl.addWidget(self.leVoimaresultantti, iY, 1)
+        gl.addWidget(self.cbYksikko, iY, 2)
+
+        self.frame.setLayout(gl)
+
+    def showEvent(self, event):
+        self.setPos(self.pistekuorma.scenePos())
+        QAsetusWidget.showEvent(self, event)

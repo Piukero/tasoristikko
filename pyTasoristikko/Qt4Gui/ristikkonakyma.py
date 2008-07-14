@@ -145,3 +145,11 @@ class QRistikkoScene(QtGui.QGraphicsScene):
         for item in self.widgetit:
             if isinstance(item, QAsetusWidget) and not item == widget:
                 item.hide()
+
+    def valitseItem(self, item):
+        """Asettaa annetun C{QGraphicsItemin} valituksi. Poistaa samalla muiden
+        itemien valinnat.
+        @param item: Valittava C{QGraphicsItem}
+        @type item: C{QGraphicsItem}"""
+        for i in self.items():
+            i.setSelected(i == item)
