@@ -81,7 +81,7 @@ class QPistekuormaValinta(QValintaItem):
         @type: C{QtGui.QPen}"""
         self.pen.setStyle(QtCore.Qt.DashLine)
 
-        self.rect = QtCore.QRectF(-8, -8, 16, -46)
+        self.rect = QtCore.QRectF(-8, -8, -46, 16)
         """@ivar: Piirettävä C{QRectF}
         @type: C{QtCore.QRectF}"""
 
@@ -90,4 +90,21 @@ class QPistekuormaValinta(QValintaItem):
         painter.drawRect(self.rect)
 
     def boundingRect(self):
-        return QtCore.QRectF(-8, -8, 16, -46)
+        return QtCore.QRectF(-8, -8, -46, 16)
+
+class QTukiValinta(QValintaItem):
+    """Tukivoiman valintaa kuvaava luokka."""
+    def __init__(self, ristikkoItem):
+        QValintaItem.__init__(self, ristikkoItem)
+
+        self.pen = QtGui.QPen(QtCore.Qt.gray)
+        """@ivar: Piirtämiseen käytetävä C{QPen}
+        @type: C{QtGui.QPen}"""
+        self.pen.setStyle(QtCore.Qt.DashLine)
+
+    def paint(self, painter, options, widget):
+        painter.setPen(self.pen)
+        painter.drawRect(self.ristikkoItem.boundingRect())
+
+    def boundingRect(self):
+        return self.ristikkoItem.boundingRect()

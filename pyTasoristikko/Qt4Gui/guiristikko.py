@@ -20,6 +20,8 @@
 
 from PyQt4 import QtCore, QtGui
 
+from math import *
+
 from pyTasoristikko.ristikko import *
 from ristikkowidgetit import *
 from valintaitemit import *
@@ -125,6 +127,26 @@ class QNivel(QRistikkoItem, Nivel):
         self.asetaKoordinaatit(x, y)
         self.alustettu = True
 
+    def luoMenuActionit(self):
+        self.lisaaNiveltukiAction = QtGui.QAction(u'Lisää niveltuki', self.menu)
+        """@ivar: C{QAction}, jolla voi lisätä niveltuen niveleen
+        @type: C{QtGui.QAction}"""
+        self.menu.addAction(self.lisaaNiveltukiAction)
+        QtCore.QObject.connect(self.lisaaNiveltukiAction,
+                               QtCore.SIGNAL('triggered()'),
+                               self._menuLisaaNiveltuki)
+
+        self.lisaaRullatukiAction = QtGui.QAction(u'Lisää rullatuki', self.menu)
+        """@ivar: C{QAction}, jolla voi lisätä rullauten niveleen
+        @type: C{QtGui.QAction}"""
+        self.menu.addAction(self.lisaaRullatukiAction)
+        QtCore.QObject.connect(self.lisaaRullatukiAction,
+                               QtCore.SIGNAL('triggered()'),
+                               self._menuLisaaRullatuki)
+
+        self.menu.addSeparator()
+        QRistikkoItem.luoMenuActionit(self)
+
     def asetaKoordinaatit(self, x, y):
         Nivel.asetaKoordinaatit(self, x, y)
         
@@ -182,6 +204,18 @@ class QNivel(QRistikkoItem, Nivel):
         if not pistekuorma in self.scene().items():
             self.scene().addItem(pistekuorma)
 
+    def lisaaTuki(self, tuki):
+        Nivel.lisaaTuki(self, tuki)
+        tuki.setParentItem(self)
+
+    def _menuLisaaNiveltuki(self):
+        """Lisää niveltuen tähän niveleen."""
+        tuki = QNiveltuki(self)
+
+    def _menuLisaaRullatuki(self):
+        """Lisää rullatuen tähän niveleen."""
+        tuki = QRullatuki(self)
+
 
 class QSauva(QRistikkoItem, Sauva):
     """Tämä luokka kuvaa piirettävää sauvaa."""
@@ -214,7 +248,9 @@ class QSauva(QRistikkoItem, Sauva):
                                       -extra, extra, extra)
 
 class QPistekuorma(QRistikkoItem, Pistekuorma):
-    """Tämä luokka kuvaa piirettävää pistekuormaa."""
+    """Tämä luokka kuvaa piirettävää pistekuormaa.
+    @todo: Voiman suuruus ja yksikkö pitäisi piirtää jotenkin
+    @todo: Pistekurman siirto (toiseen niveleen ja pyöritys"""
     def __init__(self, nivel, kuormaX, kuormaY):
         QRistikkoItem.__init__(self)
         Pistekuorma.__init__(self, nivel, kuormaX, kuormaY)
@@ -227,6 +263,15 @@ class QPistekuorma(QRistikkoItem, Pistekuorma):
         @type: C{QtGui.QPen}"""
         self.pen.setWidth(3)
 
+        self.suuntakulma = self.laskeSuuntakulma()
+        """@ivar: Tuen komponenteista laskettu suuntakulma
+        @type: C{float}"""
+        self.asetaSuuntakulma(self.suuntakulma)
+
+        self.resultantti = self.laskeResultantti()
+        """@ivar: Pistekuorman komponenttien resultantti
+        @type: C{float}"""
+
         self.valinta = QPistekuormaValinta(self)
         self.asetukset = QPistekuormaWidget(self.nivel.scene(), self)
 
@@ -234,20 +279,125 @@ class QPistekuorma(QRistikkoItem, Pistekuorma):
 
     def paint(self, painter, option, widget):
         painter.setPen(self.pen)
-        painter.drawLine(0, -50, 0, -10)
-        painter.drawLine(0, -10, 5, -20)
-        painter.drawLine(0, -10, -5, -20)
+        painter.drawLine(-50, 0, -10, 0)
+        painter.drawLine(-10, 0, -20, 5)
+        painter.drawLine(-10, 0, -20, -5)
 
     def boundingRect(self):
-        return QtCore.QRectF(-5, -10, 10, -40)
+        return QtCore.QRectF(-10, -5, -40, 10)
 
-       
-class QNiveltuki(QRistikkoItem, Tuki):
+    def asetaSuuntakulma(self, suuntakulma):
+        """Asettaa pistekuorman suuntakulman.
+        @param suuntakulma: Asetettava suuntakulma
+        @type suuntakulma: C{float}
+        @todo: komponentit pitäis laskea"""
+        rotMatriisi = QtGui.QMatrix()
+        rotMatriisi.rotate(360.0-suuntakulma)
+        self.setMatrix(rotMatriisi)
+
+        self.suuntakulma = suuntakulma
+
+    def laskeSuuntakulma(self):
+        """Laskee akseleiden suuntaisista komponenteista pistekuorman
+        suuntakulma x-akselin suhteen. Suuntakulma on aina positiivinen ja
+        väliltä 0-359.
+        @returns: pistekuorman suuntakulma
+        @rtype: C{float}"""
+        kulma = degrees(atan2(self.kY, self.kX))
+        if kulma < 0:
+            kulma = 360.0 + kulma
+
+        return kulma
+
+    def laskeResultantti(self):
+        """Laskee voiman komponenteista resultantin.
+        @returns: Voiman komponenttien resultantti
+        @rtype: C{float}"""
+        return sqrt(pow(self.kX,2) + pow(self.kY,2))
+
+class QTuki(QRistikkoItem):
+    """Tämä luokka kuvaa piirettävää tukea. Tämän luokan instanssit eivät ole
+    varsinaisesti piirettäviä, mutta toteuttavat tuille yhteisiä
+    ominaisuuksia."""
+    def __init__(self):
+        QRistikkoItem.__init__(self)
+
+        self.naytetaanTukivoimat = False
+        """@ivar: Piiretäänkö tuen sijasta tukivoimat
+        @type: C{bool}"""
+
+    def luoMenuActionit(self):
+        self.naytaTukivoimatAction = QtGui.QAction(u'Näytä tukivoimat',
+                self.menu)
+        """@ivar: Actioni, jolla voi valita näytetäänkö tukivoimat vai tuki
+        @type: C{QtGui.QAction}"""
+        self.naytaTukivoimatAction.setCheckable(True)
+        self.naytaTukivoimatAction.setChecked(False)
+        self.menu.addAction(self.naytaTukivoimatAction)
+
+        QtCore.QObject.connect(self.naytaTukivoimatAction,
+        QtCore.SIGNAL('triggered(bool)'), self._asetaNaytaTukivoimat)
+
+        self.menu.addSeparator()
+        QRistikkoItem.luoMenuActionit(self)
+
+    def _asetaNaytaTukivoimat(self, naytetaanko):
+        """Asettaa näytetäänkö tukivoimat.
+        @param naytetaanko: Näytetäänkö tukivoimat
+        @type naytetaanko: C{bool}"""
+        self.naytetaanTukivoimat = naytetaanko
+
+    def paint(self, painter, options, widget):
+        """Alaluokan ei tarvitse enää toteuttaa tätä. C{boundingRect()} pitää
+        kuitekin toteuttaa."""
+        if self.naytetaanTukivoimat:
+            self.piirraTukivoimat(painter)
+        else:
+            self.piirraTuki(painter)
+
+    def piirraTukivoimat(self, painter):
+        """Piirtää tuen tukivoimat. Alaluokan tulee toteuttaa.
+        @param painter: Piirtämiseen käytettävä C{QPainter}
+        @type painter: C{QtGui.QPainter}"""
+        pass
+
+    def piirraTuki(self, painter):
+        """Piirtää itse tuen. Alaluokan tulee toteuttaa.
+        @param painter: Piirtämiseen käytettävä C{QPainter}
+        @type painter: C{QtGui.QPainter}"""
+        pass
+
+    def _piirraKolmio(self, painter):
+        """Piirtää tuen 'kolmion'.
+        @param painter: Piirtämiseen käytettävä C{QPainter}
+        @type painter: C{QtGui.QPainter}"""
+        pen = QtGui.QPen(QtCore.Qt.black)
+        pen.setWidth(2)
+        painter.setPen(pen)
+        painter.setBrush(QtGui.QBrush(QtCore.Qt.white))
+        
+        painter.drawConvexPolygon(
+                 QtCore.QPointF(0, 7),
+                 QtCore.QPointF(-15, 30),
+                 QtCore.QPointF(15, 30))
+
+    def _piirraTaso(self, painter, etaisyys):
+        """Piirtää tason, johon tuki liitetään.
+        @param painter: Piirtämiseen käytettävä C{QPainter}
+        @type painter: C{QtGui.QPainter}
+        @param etaisyys: Etäisyys nivelen keskipisteestä
+        @type etaisyys: C{int}"""
+        painter.drawLine(-20, etaisyys, 20, etaisyys)
+        for x in range(-15, 20, 5):
+            painter.drawLine(x, etaisyys, x-5, etaisyys + 5)
+
+
+class QNiveltuki(QTuki, Tuki):
     """Tämä luokka kuvaa piirettävää niveltukea. Niveltuki on tukevaan
     pintaan jäykästi kiinitetty tuki."""
     def __init__(self, nivel, suuntakulma=0.0):
         """Konstruktori."""
-        QRistikkoItem.__init__(self)
+        QTuki.__init__(self)
         Tuki.__init__(self, nivel, suuntakulma)
         
         self.tukivoimaKulmat = [0.0, 90.0]
@@ -257,13 +407,30 @@ class QNiveltuki(QRistikkoItem, Tuki):
         self.setFlags(QtGui.QGraphicsItem.ItemIsMovable |
                       QtGui.QGraphicsItem.ItemIsSelectable |
                       QtGui.QGraphicsItem.ItemIsFocusable)
+
+        self.valinta = QTukiValinta(self)
+        self.asetukset = QTukiWidget(nivel.scene(), self)
         
-class QRullatuki(QRistikkoItem, Tuki):
+    def piirraTuki(self, painter):
+        self._piirraKolmio(painter)
+        self._piirraTaso(painter, 30)
+            
+    def boundingRect(self):
+        return QtCore.QRectF(-20, 7, 40, 35)
+ 
+    def asetaSuuntakulma(self, suuntakulma):
+        Tuki.asetaSuuntakulma(self, suuntakulma)
+
+        rotMatriisi = QtGui.QMatrix()
+        rotMatriisi.rotate(360.0-suuntakulma)
+        self.setMatrix(rotMatriisi)
+
+class QRullatuki(QTuki, Tuki):
     """Tämä luokka kuvaa piirettävää rullatukea. Rullatuki on tukevaan
     pintaan rullilla kiinitetty tuki."""
     def __init__(self, nivel, suuntakulma=0.0):
         """Konstruktori."""
-        QRistikkoItem.__init__(self)
+        QTuki.__init__(self)
         Tuki.__init__(self, nivel, suuntakulma)
         
         self.tukivoimaKulmat = [90.0]
@@ -273,3 +440,23 @@ class QRullatuki(QRistikkoItem, Tuki):
         self.setFlags(QtGui.QGraphicsItem.ItemIsMovable |
                       QtGui.QGraphicsItem.ItemIsSelectable |
                       QtGui.QGraphicsItem.ItemIsFocusable)
+
+        self.valinta = QTukiValinta(self)
+        self.asetukset = QTukiWidget(nivel.scene(), self)
+
+    def piirraTuki(self, painter):
+        self._piirraKolmio(painter)
+        painter.drawEllipse(-15, 30, 15, 15)
+        painter.drawEllipse(0, 30, 15, 15)
+        self._piirraTaso(painter, 45)
+
+    def boundingRect(self):
+        return QtCore.QRectF(-20, 7, 40, 50)
+
+    def asetaSuuntakulma(self, suuntakulma):
+        Tuki.asetaSuuntakulma(self, suuntakulma)
+
+        rotMatriisi = QtGui.QMatrix()
+        rotMatriisi.rotate(360.0-suuntakulma)
+        self.setMatrix(rotMatriisi)
+
