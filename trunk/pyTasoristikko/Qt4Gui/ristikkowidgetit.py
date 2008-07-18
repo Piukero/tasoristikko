@@ -175,15 +175,21 @@ class QPistekuormaWidget(QAsetusWidget):
         """@ivar: Pistekuorma, johon tämä widget kuuluu
         @type: L{QPistekuorma}"""
 
-        self.sbSuuntakulma = QtGui.QSpinBox()
+        self.sbSuuntakulma = QtGui.QDoubleSpinBox()
         """@ivar: Suuntakulman C{QSpinBox}
         @type: C{QtGui.QSpinBox}"""
         self.sbSuuntakulma.setRange(0, 359)
+        self.sbSuuntakulma.setValue(pistekuorma.suuntakulma)
+        self.sbSuuntakulma.setWrapping(True)
         self.sbSuuntakulma.setSuffix(u'\N{DEGREE SIGN}')
+        QtCore.QObject.connect(self.sbSuuntakulma,
+        QtCore.SIGNAL('valueChanged(double)'), self.pistekuorma.asetaSuuntakulma)
 
         self.leVoimaresultantti = QtGui.QLineEdit()
         """@ivar: Voiman resultantin C{QLineEdit}
         @type: C{QtGui.QLineEdit}"""
+        self.leVoimaresultantti.setText('%.2f' % self.pistekuorma.resultantti)
+        self.leVoimaresultantti.setAlignment(QtCore.Qt.AlignRight)
 
         self.cbYksikko = QtGui.QComboBox()
         """@ivar: Yksikön C{QComboBox}
@@ -204,4 +210,35 @@ class QPistekuormaWidget(QAsetusWidget):
 
     def showEvent(self, event):
         self.setPos(self.pistekuorma.scenePos())
+        QAsetusWidget.showEvent(self, event)
+
+class QTukiWidget(QAsetusWidget):
+    """Tämä luokka kuvaa tuen asetuswidgettiä."""
+    def __init__(self, scene, tuki, parent=None, wFlags=0):
+        QAsetusWidget.__init__(self, scene, parent, wFlags)
+
+        self.tuki = tuki
+        """@ivar: Tuki, johon tämä asetuswidget liitty
+        @type: L{QTuki}"""
+
+        self.sbSuuntakulma = QtGui.QDoubleSpinBox()
+        """@ivar: Suuntakulman C{QSpinBox}
+        @type: C{QtGui.QSpinBox}"""
+        self.sbSuuntakulma.setRange(0, 359)
+        self.sbSuuntakulma.setValue(tuki.suuntakulma)
+        self.sbSuuntakulma.setWrapping(True)
+        self.sbSuuntakulma.setSuffix(u'\N{DEGREE SIGN}')
+        QtCore.QObject.connect(self.sbSuuntakulma,
+                               QtCore.SIGNAL('valueChanged(double)'),
+                               self.tuki.asetaSuuntakulma)
+
+        gl = QtGui.QGridLayout()
+        iY = 0
+        gl.addWidget(QtGui.QLabel('Suuntakulma'), iY, 0)
+        gl.addWidget(self.sbSuuntakulma, iY, 1)
+
+        self.frame.setLayout(gl)
+
+    def showEvent(self, event):
+        self.setPos(self.tuki.scenePos())
         QAsetusWidget.showEvent(self, event)
