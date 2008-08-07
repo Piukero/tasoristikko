@@ -154,7 +154,10 @@ class QNivel(QRistikkoItem, Nivel):
                              y*self.scene().koordinaattiKerroin)
         pos = self.scene().siirtoMatriisi.map(pos)
         self.setPos(pos)
-    
+
+        if not self.scene().ristikko:
+            return
+
     def paint(self, painter, option, widget=None):
         painter.setPen(self.pen)
         painter.setBrush(self.brush)
@@ -185,11 +188,11 @@ class QNivel(QRistikkoItem, Nivel):
         self.y = kaanPos.y() / self.scene().koordinaattiKerroin
 
     def poista(self):
-        Nivel.poista(self)
-        self.scene().removeItem(self.asetukset)
         for sauva in self.sauvat:
-            self.scene().removeItem(sauva)
+            if sauva in self.scene().items():
+                self.scene().removeItem(sauva)
         self.scene().removeItem(self)
+        Nivel.poista(self)
 
     def lisaaSauva(self, sauva):
         """@type sauva: L{QSauva}"""
@@ -201,8 +204,6 @@ class QNivel(QRistikkoItem, Nivel):
         """@type pistekuorma: L{QPistekuorma}"""
         Nivel.lisaaPistekuorma(self, pistekuorma)
         pistekuorma.setParentItem(self)
-        if not pistekuorma in self.scene().items():
-            self.scene().addItem(pistekuorma)
 
     def lisaaTuki(self, tuki):
         Nivel.lisaaTuki(self, tuki)
@@ -296,6 +297,8 @@ class QPistekuorma(QRistikkoItem, Pistekuorma):
         self.setMatrix(rotMatriisi)
 
         self.suuntakulma = suuntakulma
+
+        self.nivel.ristikko.muuttui()
 
     def laskeSuuntakulma(self):
         """Laskee akseleiden suuntaisista komponenteista pistekuorman

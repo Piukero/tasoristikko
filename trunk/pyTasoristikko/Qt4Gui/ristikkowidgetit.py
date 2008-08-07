@@ -123,6 +123,7 @@ class QNivelWidget(QAsetusWidget):
         """Vaihtaa nivelen koordinaatit ja piilottaa itsensä."""
         x = float(self.lineEditX.text())
         y = float(self.lineEditY.text())
+        print 'x: %f y: %f' % (x, y)
         self.setVisible(False)
         self.nivel.asetaKoordinaatit(x, y)
 

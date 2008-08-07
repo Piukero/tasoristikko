@@ -22,6 +22,11 @@ lisätään niveleen, joka puolestaan lisää ne ristikkoon. Myös kaikki
 muut operaatiot tehdään C{Nivel}-luokan kautta. Ideana on, että alemman tason
 luokkien operaatiot yksinkertaistuvat, jolloin ei tarvitse miettiä, mistä
 kaikista luokista pitää operaatioita kutsua.
+
+Instanssien voimat kuvataan niin, että voimien muuttujien kerroin on aina yksi.
+Yksikko-muuttujalla kerrotaan ainoastaan miten voima kuvataan esimerkiksi
+käyttöliittymässä. Esimerkiksi jos voima on I{1 kN} on voiman muuttuja I{1000}
+ja C{yksikko} on 'kN'.
 """
 
 from numpy import sqrt, square, sin, cos, pi, array
@@ -97,6 +102,7 @@ class Nivel(object):
         if not sauva in self.sauvat:
             self.sauvat.append(sauva)
             self.ristikko.lisaaSauva(sauva)
+        self.ristikko.muuttui()
             
     def lisaaTukivoima(self, tukivoima):
         """Lisää niveleen tukivoiman. Tätä ei yleensä tarvitse kutsua luokan
@@ -105,6 +111,7 @@ class Nivel(object):
         @type tukivoima: L{Tukivoima<pyTasoristikko.ristikko.Tukivoima>}"""
         if not tukivoima in self.tukivoimat:
             self.tukivoimat.append(tukivoima)
+        self.ristikko.muuttui()
             
     def lisaaPistekuorma(self, pistekuorma):
         """Lisää niveleen pistekuorman.
@@ -113,6 +120,7 @@ class Nivel(object):
         if not pistekuorma in self.pistekuormat:
             self.pistekuormat.append(pistekuorma)
             self.ristikko.lisaaPistekuorma(pistekuorma)
+        self.ristikko.muuttui()
             
     def lisaaTuki(self, tuki):
         """Lisää niveleen tuen."""
@@ -121,6 +129,7 @@ class Nivel(object):
             self.ristikko.lisaaTuki(tuki)
             for tukivoima in tuki.tukivoimat:
                 self.lisaaTukivoima(tukivoima)
+        self.ristikko.muuttui()
 
     def asetaKoordinaatit(self, x, y):
         """Asettaa nivelen koordinaatit
@@ -130,6 +139,7 @@ class Nivel(object):
         @type y: float"""
         self.x = x
         self.y = y
+        self.ristikko.muuttui()
 
     def poista(self):
         """Poistaa nivelen ja kaikki niveleen kuuluvat osat ristikosta."""
@@ -142,6 +152,7 @@ class Nivel(object):
         if pistekuorma in self.pistekuormat:
             self.pistekuormat.remove(pistekuorma)
         self.ristikko.poistaPistekuorma(pistekuorma)
+        self.ristikko.muuttui()
 
     def poistaSauva(self, sauva):
         """Poistaa nivelestä ja ristikosta sauvan.
@@ -255,6 +266,7 @@ class Tukivoima(Voimasuure):
         @param suuntakulma: asetettava suuntakulma
         @type suuntakulma: C{float}"""
         self.suuntakulma = suuntakulma
+        self.nivel.ristikko.muuttui()
 
 class Pistekuorma(object):
     """Tämä luokka kuvaa niveleen kohdsituvaa pistekuormaa."""
@@ -275,6 +287,9 @@ class Pistekuorma(object):
         self.kY = kuormaY
         """@ivar: Voiman y-akselin suuntainen komponentti
         @type: C{float}"""
+        self.yksikko = ''
+        """@ivar: Pistekuorman yksikko
+        @type: C{string}"""
         self.nivel.lisaaPistekuorma(self)
 
     def poista(self):
@@ -301,6 +316,12 @@ class Ristikko(object):
         @type: C{list} of L{Tuki}"""
         self.ratkaistu = False
         """@ivar: Onko ristikko ratkaistu
+        @type: C{bool}"""
+        self.tiedostoNimi = ''
+        """@ivar: Tiedosto, johon ristikko on tallenettu
+        @type: C{string}"""
+        self.tallennettu = False
+        """@ivar: Onko tämä versio ristikosta tallenettu
         @type: C{bool}"""
 
     def lisaaSauva(self, sauva):
@@ -345,6 +366,13 @@ class Ristikko(object):
             for tukivoima in tuki.tukivoimat:
                 self.lisaaTukivoima(tukivoima)
         self.ratkaistu = False
+
+    def asetaTallennetuksi(self, tiedosto):
+        """Kertoo ristikolle, että se on tallennettu tiedostoon.
+        @param tiedosto: Tiedosto, johon tallennettu
+        @type tiedosto: C{string}"""
+        self.tiedostoNimi = tiedosto
+        self.tallennettu = True
     
     def asetaRatkaistuksi(self):
         """Asettaa ristikon ratkaistuksi."""
@@ -373,7 +401,7 @@ class Ristikko(object):
             for pistekuorma in nivel.pistekuormat:
                 self.poistaPistekuorma(pistekuorma)
             self.nivelet.remove(nivel)
-        self.ratkaistu = False
+        self.muuttui()
 
     def poistaSauva(self, sauva):
         """Poistaa annetun sauvan ristikosta.
@@ -381,7 +409,7 @@ class Ristikko(object):
         @type sauva: L{Sauva}"""
         if sauva in self.sauvat:
             self.sauvat.remove(sauva)
-        self.ratkaistu = False
+        self.muuttui()
 
     def poistaTuki(self, tuki):
         """Poistaa annetun tuen ristikosta.
@@ -392,7 +420,7 @@ class Ristikko(object):
                 if tv in self.tukivoimat:
                     self.tukivoimat.remove(tv)
             self.tuet.remove(tuki)
-        self.ratkaistu = False
+        self.muuttui()
 
     def poistaPistekuorma(self, pistekuorma):
         """Poistaa annetun pistekuorman ristikosta.
@@ -400,7 +428,18 @@ class Ristikko(object):
         @type pistekuorma: L{Pistekuorma}"""
         if pistekuorma in self.pistekuormat:
             self.pistekuormat.remove(pistekuorma)
+        self.muuttui()
+
+    def poista(self):
+        """Poistaa koko ristikon."""
+        nivelet = self.nivelet[:]
+        for nivel in nivelet:
+            nivel.poista()
+
+    def muuttui(self):
+        """Tätä kutsumalla kerrotaan ristikolle, että se muuttui."""
         self.ratkaistu = False
+        self.tallennettu = False
 
 class Tuki(object):
     """Tämä luokka kuvaa nivleen liitettyä tukea. Yhdessä tuessa voi olla
@@ -425,12 +464,17 @@ class Tuki(object):
         self.suuntakulma = suuntakulma
         """@ivar: Tuen suuntakulma pystyasemaan nähden
         @type: C{float}"""
+        self.asetaSuuntakulma(suuntakulma)
+
         self.nivel = nivel
         """@ivar: Nivel, johon tuki liittyy
         @type: L{Nivel}"""
         self.tyyppi = Tuki.TUNTEMATON
         """@ivar: Nivelen tyyppi
         @type: C{int}"""
+        self.yksikko = ''
+        """@ivar: Tuen tukivoimien yksikko
+        @type: C{String}"""
         
     def asetaSuuntakulma(self, suuntakulma):
         """Asettaa tuen ja sen tukivoimien suuntakulman.
@@ -459,7 +503,7 @@ class Tuki(object):
         @rtype: C{tuple} of C{float}"""
         x = 0.0
         y = 0.0
-        if not ristikko.ratkaistu:
+        if not self.nivel.ristikko.ratkaistu:
             return (x, y)
         for tukivoima in self.tukivoimat:
             x += cos(tukivoima.suuntakulma*180/pi)*tukivoima.suuruus

@@ -21,27 +21,36 @@ tiedostoon tallettamista varten tehdyt funktiot. Talennettu tiedosto on yksinker
 
 Tietokannan taulut on esitetty tarkemmin projektin wiki-sivulla 
 U{Tiedosto<http://code.google.com/p/tasoristikko/wiki/Tiedosto>}.
-
-@todo: Tuille vielä oma taulu
 """
+
 
 import sqlite3
 import os
 
 import ristikko
+from ristikkopoikkeukset import RistikkoIOVirhe
 
 def TallennaRistikko(ristikko, tiedostoNimi):
     """
-    Tallentaa ristikon tiedostoon.
+    Tallentaa ristikon tiedostoon. Tämä funktio poistaa aikaisemman tiedoston,
+    jos sellainen on olemassa. Jos haluaa tehdä tarkistuksia pitää ne tehdä
+
+    muualla.
     @param ristikko: Tallennettava ristikko
     @type ristikko: L{Ristikko<pyTasoristikko.ristikko.Ristikko>}
     @param tiedostoNimi: Tallennettavan tiedoston nimi
     @type tiedostoNimi: C{string}
+    @raise RistikkoIOVirhe: Jos tiedostoa ei voida kirjoittaa
     """
 
-    onkoTiedostoa = os.path.exists(tiedostoNimi)
+    if os.path.exists(tiedostoNimi):
+        os.remove(tiedostoNimi)
 
-    conn = sqlite3.connection(tiedostoNimi)
+    if not os.access(os.path.dirname(tiedostoNimi), os.W_OK):
+        raise RistikkoIOVirhe(u'Sinulla ei ole oikeuksia kirjoittaa tiedostoa'
+                             + u' tähän hakemistoon.');
+
+    conn = sqlite3.connect(tiedostoNimi)
     cur = conn.cursor()
 
     tableSkripti = """
@@ -61,11 +70,13 @@ def TallennaRistikko(ristikko, tiedostoNimi):
         Nivel2      INTEGER
     );
 
-    create table Tukivoima(
-        TukivoimaNro    INTEGER PRIMARY KEY,
-        Suuruus         REAL,
-        Yksikko         TEXT,
+    create table Tuki(
+        TukiNro         INTEGER PRIMARY KEY,
+        Tyyppi          INTEGER,
         Suuntakulma     REAL,
+        SuuruusX        REAL,
+        SuuruusY        REAL,
+        Yksikko         TEXT,
         Nivel           INTEGER
     );
 
@@ -78,16 +89,13 @@ def TallennaRistikko(ristikko, tiedostoNimi):
     );
     """
 
-    if onkoTiedostoa:
-        cur.execute("delete from table Nivel, Sauva, Tukivoima, Pistekuorma")
-    else:
-        cur.executescript(tableSkripti)
+    cur.executescript(tableSkripti)
 
     nivelDict = {}
     nivelNro = 0
     for nivel in ristikko.nivelet:
         tiedot = (nivelNro, nivel.nimi, nivel.x, nivel.y)
-        cur.execute("insert into Nivel(NivelNro, Nimi, x, y) values (?,?,?,?)",
+        cur.execute('insert into Nivel(NivelNro, Nimi, x, y) values (?,?,?,?)',
                 tiedot)
         nivelDict[nivel] = nivelNro
         nivelNro += 1
@@ -97,42 +105,92 @@ def TallennaRistikko(ristikko, tiedostoNimi):
         n1Nro = nivelDict[sauva.n1]
         n2Nro = nivelDict[sauva.n2]
         tiedot = (sauvaNro, sauva.nimi, sauva.suuruus, sauva.yksikko, n1Nro,
-                n2Nro)
-        cur.execute("insert into Sauva(SauvaNro, Nimi, Suuruus, Yksikko,"
-               +"Nivel1, Nivel2) values (?,?,?,?,?,?)", tiedot)
+                  n2Nro)
+        cur.execute('insert into Sauva(SauvaNro, Nimi, Suuruus, Yksikko,'
+               +'Nivel1, Nivel2) values (?,?,?,?,?,?)', tiedot)
         sauvaNro += 1
 
-    tukivoimaNro = 0
-    for tv in ristikko.tukivoimat:
-        nNro = nivelDict[tv.nivel]
-        tiedot = (tukivoimaNro, tv.suuruus, tv.yksikko, tv.suuntakulma, nNro)
-        cur.execute("insert into Tukivoima(TukivoimaNro, Suuruus, Yksikko,"
-                +"Suuntakulma, Nivel) values (?,?,?,?,?)", tiedot)
-        tukivoimaNro += 1
+    tukiNro = 0
+    for tuki in ristikko.tuet:
+        nNro = nivelDict[tuki.nivel]
+        suuruusX, suuruusY = tuki.annaResultantti()
+        tiedot = (tukiNro, tuki.tyyppi, tuki.suuntakulma, suuruusX, suuruusY,
+                  tuki.yksikko, nNro)
+        cur.execute('insert into Tuki(TukiNro, Tyyppi, Suuntakulma,'
+                   +'SuuruusX,SuuruusY,Yksikko, Nivel)'
+                   +' values (?,?,?,?,?,?,?)', tiedot)
+        tukiNro += 1
 
     pistekuormaNro = 0
     for pk in ristikko.pistekuormat:
-        nNro = nivelDict(pk.nivel)
+        nNro = nivelDict[pk.nivel]
         tiedot = (pistekuormaNro, pk.kX, pk.kY, pk.yksikko, nNro)
-        cur.execute("insert into Pistekuorma(PistekuormaNro, XKomp, YKomp,"
-                + "Yksikko, Nivel) values (?,?,?,?,?)", tiedot)
+        cur.execute('insert into Pistekuorma(PistekuormaNro, XKomp, YKomp,'
+                + 'Yksikko, Nivel) values (?,?,?,?,?)', tiedot)
         pistekuormaNro += 1
 
     conn.commit()
     cur.close()
 
+    ristikko.asetaTallennetuksi(tiedostoNimi)
+
 def AvaaRistikko(tiedostoNimi, ristikkoTehdas):
     """
     Avaa ristikon tiedostosta.
-    @todo: tehtävä kokonaan
     @param tiedostoNimi: Avattavan tiedoston nimi
     @type tiedostoNimi: C{string}
     @param ristikkoTehdas: C{Ristikkotehdas}, jolla ristikko luodaan
     @type ristikkoTehdas: L{Ristikkotehdas<ristikkotehdas.Ristikkotehdas>}
+    @raise RistikkoIOExceptio: jos avaus ei onnistunut
     """
+
+    rt = ristikkoTehdas
+    if not os.access(tiedostoNimi, os.R_OK):
+        raise RistikkoIOVirhe('Sinulla ei ole lukuoikeuksia tiedostoon.')
+
+    try:
+        con = sqlite3.connect(tiedostoNimi)
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+
+        nivelDict = {}
+        rivit = cur.execute('select * from Nivel')
+        for rivi in rivit:
+            nivelNro = rivi['NivelNro']
+            nimi = rivi['Nimi']
+            x = rivi['x']
+            y = rivi['y']
+            nivel = rt.luoNivel(x, y)
+            nivelDict[nivelNro] = nivel
+        
+        rivit = cur.execute('select * from Sauva')
+        for rivi in rivit:
+            nimi = rivi['Nimi']
+            n1Nro = rivi['Nivel1']
+            n2Nro = rivi['Nivel2']
+            rt.luoSauva(nivelDict[n1Nro], nivelDict[n2Nro])
+
+        rivit = cur.execute('select * from Tuki')
+        for rivi in rivit:
+            nivelNro = rivi['Nivel']
+            tyyppi = rivi['Tyyppi']
+            suuntakulma = rivi['Suuntakulma']
+            rt.luoTuki(nivelDict[nivelNro], tyyppi, suuntakulma)
+
+        rivit = cur.execute('select * from Pistekuorma')
+        for rivi in rivit:
+            nivelNro = rivi['Nivel']
+            xKomp = rivi['XKomp']
+            yKomp = rivi['YKomp']
+            rt.luoPistekuorma(nivelDict[nivelNro], xKomp, yKomp)
+
+    except sqlite3.DatabaseError:
+        raise RistikkoIOVirhe('Tiedosto ei ole oikeaa muotoa tai se on'
+                              +' korruptoitunut.')
+    except sqlite3.OperationalError:
+        raise RistikkoIOVirhe('')
     
-    ris = ristikko.Ristikko()
-    return ris
+    rt.ristikko.asetaTallennetuksi(tiedostoNimi)
 
 def AvaaAsetukset(tiedostoNimi):
     """

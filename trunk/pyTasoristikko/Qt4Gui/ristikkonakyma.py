@@ -20,20 +20,17 @@
 from PyQt4 import QtCore, QtGui
 
 from ristikkowidgetit import QAsetusWidget
+from pyTasoristikko.ristikko import Ristikko
 
 class QRistikkoView(QtGui.QGraphicsView):
     """Ristikon näyttävä QGraphicsView"""
     def __init__(self, parent=None):
         QtGui.QGraphicsView.__init__(self, parent)
-        
-        self.scene = QRistikkoScene()
-        """@ivar: Risitkon scene
-        @type: L{QRistikkoScene}"""
-        self.setScene(self.scene)
+
         self.setRenderHints(QtGui.QPainter.Antialiasing |
                 QtGui.QPainter.SmoothPixmapTransform)
 
-        self.skaalaus = 1
+        self.skaalaus = 1.0
         """@ivar: Näkymän zoomaus
         @type: C{float}"""
 
@@ -41,15 +38,16 @@ class QRistikkoView(QtGui.QGraphicsView):
         """@ivar: Pääikkuna
         @type: L{QRistikkoMainWindow<mainwindow.QRistikkoMainWindow>}"""
 
-        vsb = self.verticalScrollBar()
-        vsb.setSliderPosition(vsb.maximum())
-
     def ruudukkoValinta(self, paalla):
         """Valitsee onko ruudukko näkyvissä.
         @param paalla: onko ruudukko päällä
         @type paalla: boolean"""
         self.scene.ruudukkoValinta(paalla)
 
+    def setScene(self, scene):
+        QtGui.QGraphicsView.setScene(self, scene)
+        vsb = self.verticalScrollBar()
+        vsb.setSliderPosition(vsb.maximum())
 
 class QRistikkoScene(QtGui.QGraphicsScene):
     """QGraphicsScene, jolla ristikko piirretään."""
@@ -73,6 +71,10 @@ class QRistikkoScene(QtGui.QGraphicsScene):
         self.widgetit = []
         """@ivar: skenen widgetit
         @type: C{list} of L{QAsetusWidget}"""
+
+        self.ristikko = None
+        """@ivar: Skeneen kuuluva ristikko
+        @type: L{Ristikko}"""
 
     def drawBackground(self, painter, rect):
         # Ristikko
@@ -124,11 +126,16 @@ class QRistikkoScene(QtGui.QGraphicsScene):
         self.ruudukkoPaalla = paalla
         self.update()
         
-    def lisaaRistikko(self, ristikko):
-        """Lisää sceneen ristikon.
+    def asetaRistikko(self, ristikko):
+        """Asettaa scenen ristikon.
         @param ristikko: lisättävä ristikko
         @type ristikko: L{Ristikko<pyTasoristikko.ristikko.Ristikko>}"""
-        self.ristikko = ristikko #: Sceneen kuuluva ristikko
+        for w in self.widgetit:
+            if w in self.items():
+                self.removeItem(w)
+        if self.ristikko:
+            self.ristikko.poista()
+        self.ristikko = ristikko
 
     def lisaaWidget(self, widget):
         """Lisää sekeneen widgetin.
@@ -153,3 +160,8 @@ class QRistikkoScene(QtGui.QGraphicsScene):
         @type item: C{QGraphicsItem}"""
         for i in self.items():
             i.setSelected(i == item)
+
+    def uusiRistikko(self):
+        """Luo skeneen uuden tyhjän ristikon.
+        @todo: tarksitukset, että onko vanha ristikko tallenettu."""
+        self.asetaRistikko(Ristikko())
