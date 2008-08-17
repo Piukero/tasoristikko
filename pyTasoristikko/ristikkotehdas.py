@@ -34,25 +34,29 @@ class Ristikkotehdas(object):
         if not self.ristikko:
             self.ristikko = Ristikko()
 
-    def luoNivel(self, x, y):
+    def luoNivel(self, x, y, nimi=''):
         """Luo ristikon nivelen. Alaluokat toteuttavat.
         @param x: nivelen x-koordinaatti
         @type x: float
         @param y: nivelen y-koordinaatti
         @type y: float
+        @param nimi: Nivelen nimi
+        @type nimi: C{string}
         @returns: luotu nivel
         @rtype: L{Nivel<pyTasoristikko.ristikko.Nivel>}"""
         pass
 
-    def luoSauva(self, nivel1, nivel2):
+    def luoSauva(self, nivel1, nivel2, nimi=''):
         """Luo ristikon sauvan. Alaluokat toteuttavat.
         @param nivel1: sauvan päähän 1 liittyvä nivel
         @type nivel1: L{Nivel<pyTasoristikko.ristikko.Nivel>}
         @param nivel2: sauvan päähän 2 liittyvä nivel
-        @type nivel2: L{Nivel<pyTasoristikko.ristikko.Nivel>}"""
+        @type nivel2: L{Nivel<pyTasoristikko.ristikko.Nivel>}
+        @param nimi: Sauvan nimi
+        @type nimi: C{string}"""
         pass
 
-    def luoTuki(self, nivel, tyyppi, suuntakulma):
+    def luoTuki(self, nivel, tyyppi, suuntakulma, nimi=''):
         """Luo ristikkoon tuen. Alaluokat toteuttavat.
         @param nivel: nivel, johon tukivoima kohdistuu
         @type nivel: L{Nivel<pyTasoristikko.ristikko.Nivel>}
@@ -60,6 +64,8 @@ class Ristikkotehdas(object):
         @type tyyppi: L{ristikko.Tuki.NIVELTUKI} tai L{ristikko.Tuki.RULLATUKI}
         @param suuntakulma: tuen suuntakulma
         @type suuntakulma: C{float}
+        @param nimi: Tuen nimi
+        @type nimi: C{string}
         @raise RistikkoIOVirhe: Jos annettu tyyppi on tuntematon."""
         pass
 
