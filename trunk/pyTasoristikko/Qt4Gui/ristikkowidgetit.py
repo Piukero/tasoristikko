@@ -123,12 +123,14 @@ class QNivelWidget(QAsetusWidget):
         """Vaihtaa nivelen koordinaatit ja piilottaa itsensä."""
         x = float(self.lineEditX.text())
         y = float(self.lineEditY.text())
-        print 'x: %f y: %f' % (x, y)
+        nimi = str(self.lineEditNimi.text())
         self.setVisible(False)
         self.nivel.asetaKoordinaatit(x, y)
+        self.nivel.asetaNimi(nimi)
 
     def showEvent(self, event):
         QAsetusWidget.showEvent(self, event)
+        self.lineEditNimi.setText(self.nivel.nimi)
         self.siirra()
 
     def siirra(self):
@@ -166,6 +168,11 @@ class QSauvaWidget(QAsetusWidget):
         self.setPos(self.klikkausPos)
         self.lineEditNimi.setText(self.sauva.nimi)
         QAsetusWidget.showEvent(self, event)
+
+    def vaihdaAsetukset(self):
+        nimi = str(self.lineEditNimi.text())
+        self.setVisible(False)
+        self.sauva.asetaNimi(nimi)
 
 class QPistekuormaWidget(QAsetusWidget):
     """Tämä luokka kuvaa pistekuorman asetuswidgettiä."""
@@ -222,9 +229,13 @@ class QTukiWidget(QAsetusWidget):
         """@ivar: Tuki, johon tämä asetuswidget liitty
         @type: L{QTuki}"""
 
+        self.leNimi = QtGui.QLineEdit()
+        """@ivar: Nimen C{QLineEdit}
+        @type: C{QtGui.QLineEdit}"""
+
         self.sbSuuntakulma = QtGui.QDoubleSpinBox()
-        """@ivar: Suuntakulman C{QSpinBox}
-        @type: C{QtGui.QSpinBox}"""
+        """@ivar: Suuntakulman C{QDoubleSpinBox}
+        @type: C{QtGui.QDoubleSpinBox}"""
         self.sbSuuntakulma.setRange(0, 359)
         self.sbSuuntakulma.setValue(tuki.suuntakulma)
         self.sbSuuntakulma.setWrapping(True)
@@ -235,11 +246,23 @@ class QTukiWidget(QAsetusWidget):
 
         gl = QtGui.QGridLayout()
         iY = 0
-        gl.addWidget(QtGui.QLabel('Suuntakulma'), iY, 0)
+        gl.addWidget(QtGui.QLabel('Nimi:'), iY, 0)
+        gl.addWidget(self.leNimi, iY, 1)
+        iY += 1
+        gl.addWidget(QtGui.QLabel('Suuntakulma:'), iY, 0)
         gl.addWidget(self.sbSuuntakulma, iY, 1)
 
         self.frame.setLayout(gl)
 
     def showEvent(self, event):
         self.setPos(self.tuki.scenePos())
+        self.sbSuuntakulma.setValue(self.tuki.suuntakulma)
+        self.leNimi.setText(self.tuki.nimi)
         QAsetusWidget.showEvent(self, event)
+
+    def vaihdaAsetukset(self):
+        nimi = str(self.leNimi.text())
+        suuntakulma = self.sbSuuntakulma.value()
+        self.setVisible(False)
+        self.tuki.asetaNimi(nimi)
+        self.tuki.asetaSuuntakulma(suuntakulma)

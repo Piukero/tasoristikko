@@ -95,6 +95,13 @@ class Nivel(object):
         if self.ristikko:
             self.ristikko.lisaaNivel(self)
 
+    def asetaNimi(self, nimi):
+        """Asettaa nivelen nimen.
+        @param nimi: Nivelen nimi
+        @type nimi: C{string}"""
+        self.nimi = nimi
+        self.ristikko.muuttui()
+
     def lisaaSauva(self, sauva):
         """Lisää niveleen sauvan.
         @param sauva: Lisättävä sauva
@@ -234,6 +241,13 @@ class Sauva(Voimasuure):
         ey = (self.n2.y - self.n1.y)/pituus
         return array([ex,ey])
 
+    def asetaNimi(self, nimi):
+        """Asettaa sauvalle nimen
+        @param nimi: Sauvan nimi
+        @type nimi: C{string}"""
+        self.nimi = nimi
+        self.ristikko.muuttui()
+
     def poista(self):
         """Poistaa sauvan."""
         self.ristikko.poistaSauva(self)
@@ -330,7 +344,7 @@ class Ristikko(object):
         @type sauva: L{Sauva}"""
         if not sauva in self.sauvat:
             self.sauvat.append(sauva)
-        self.ratkaistu = False
+        self.muuttui()
 
     def lisaaNivel(self, nivel):
         """Lisää ristikkoon nivelen.
@@ -338,7 +352,7 @@ class Ristikko(object):
         @type nivel: L{Nivel}"""
         if not nivel in self.nivelet:
             self.nivelet.append(nivel)
-        self.ratkaistu = False
+        self.muuttui()
 
     def lisaaPistekuorma(self, pistekuorma):
         """Lisää ristikkoon pistekuorman.
@@ -346,7 +360,7 @@ class Ristikko(object):
         @type pistekuorma: L{Pistekuorma}"""
         if not pistekuorma in self.pistekuormat:
             self.pistekuormat.append(pistekuorma)
-        self.ratkaistu = False
+        self.muuttui()
 
     def lisaaTukivoima(self, tukivoima):
         """Lisää ristikkoon tukivoiman. Tätä ei ole yleensä tarvetta kutsua
@@ -355,7 +369,7 @@ class Ristikko(object):
         @type tukivoima: L{Tukivoima}"""
         if not tukivoima in self.tukivoimat:
             self.tukivoimat.append(tukivoima)
-        self.ratkaistu = False
+        self.muuttui()
     
     def lisaaTuki(self, tuki):
         """Lisää ristikkoon tuen.
@@ -365,7 +379,7 @@ class Ristikko(object):
             self.tuet.append(tuki)
             for tukivoima in tuki.tukivoimat:
                 self.lisaaTukivoima(tukivoima)
-        self.ratkaistu = False
+        self.muuttui()
 
     def asetaTallennetuksi(self, tiedosto):
         """Kertoo ristikolle, että se on tallennettu tiedostoon.
@@ -475,6 +489,9 @@ class Tuki(object):
         self.yksikko = ''
         """@ivar: Tuen tukivoimien yksikko
         @type: C{String}"""
+        self.nimi = ''
+        """@ivar: Tuen nimi
+        @type: C{string}"""
         
     def asetaSuuntakulma(self, suuntakulma):
         """Asettaa tuen ja sen tukivoimien suuntakulman.
@@ -483,6 +500,7 @@ class Tuki(object):
         self.suuntakulma = suuntakulma
         for tuki, tsuuntakulma in zip(self.tukivoimat, self.tukivoimaKulmat):
             tuki.asetaSuuntakulma(tsuuntakulma+self.suuntakulma)
+        self.nivel.ristikko.muuttui()
             
     def luoTukivoimat(self):
         """Luo tukivoimaKulmat listasta tukivoimat listan. Tätä ei yleensä
@@ -517,3 +535,10 @@ class Tuki(object):
         @param yksikko: tukivoiman yksikko
         @type yksikko: C{string}"""
         pass
+
+    def asetaNimi(self, nimi):
+        """Asettaa tuelle nimen.
+        @type nimi: Tuen nimi
+        @param nimi: C{string}"""
+        self.nimi = nimi
+        self.nivel.ristikko.muuttui()

@@ -77,7 +77,8 @@ def TallennaRistikko(ristikko, tiedostoNimi):
         SuuruusX        REAL,
         SuuruusY        REAL,
         Yksikko         TEXT,
-        Nivel           INTEGER
+        Nivel           INTEGER,
+        Nimi            TEXT
     );
 
     create table Pistekuorma(
@@ -115,10 +116,10 @@ def TallennaRistikko(ristikko, tiedostoNimi):
         nNro = nivelDict[tuki.nivel]
         suuruusX, suuruusY = tuki.annaResultantti()
         tiedot = (tukiNro, tuki.tyyppi, tuki.suuntakulma, suuruusX, suuruusY,
-                  tuki.yksikko, nNro)
+                  tuki.yksikko, nNro, tuki.nimi)
         cur.execute('insert into Tuki(TukiNro, Tyyppi, Suuntakulma,'
-                   +'SuuruusX,SuuruusY,Yksikko, Nivel)'
-                   +' values (?,?,?,?,?,?,?)', tiedot)
+                   +'SuuruusX,SuuruusY,Yksikko, Nivel, Nimi)'
+                   +' values (?,?,?,?,?,?,?,?)', tiedot)
         tukiNro += 1
 
     pistekuormaNro = 0
@@ -160,7 +161,7 @@ def AvaaRistikko(tiedostoNimi, ristikkoTehdas):
             nimi = rivi['Nimi']
             x = rivi['x']
             y = rivi['y']
-            nivel = rt.luoNivel(x, y)
+            nivel = rt.luoNivel(x, y, nimi)
             nivelDict[nivelNro] = nivel
         
         rivit = cur.execute('select * from Sauva')
@@ -168,14 +169,15 @@ def AvaaRistikko(tiedostoNimi, ristikkoTehdas):
             nimi = rivi['Nimi']
             n1Nro = rivi['Nivel1']
             n2Nro = rivi['Nivel2']
-            rt.luoSauva(nivelDict[n1Nro], nivelDict[n2Nro])
+            rt.luoSauva(nivelDict[n1Nro], nivelDict[n2Nro], nimi)
 
         rivit = cur.execute('select * from Tuki')
         for rivi in rivit:
+            nimi = rivi['Nimi']
             nivelNro = rivi['Nivel']
             tyyppi = rivi['Tyyppi']
             suuntakulma = rivi['Suuntakulma']
-            rt.luoTuki(nivelDict[nivelNro], tyyppi, suuntakulma)
+            rt.luoTuki(nivelDict[nivelNro], tyyppi, suuntakulma, nimi)
 
         rivit = cur.execute('select * from Pistekuorma')
         for rivi in rivit:

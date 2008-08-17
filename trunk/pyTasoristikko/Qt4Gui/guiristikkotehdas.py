@@ -36,20 +36,24 @@ class GuiRistikkotehdas(Ristikkotehdas):
         """@ivar: Scene johon ristikko lisätään
         @type: L{QRistikkoScene<ristikkonakyma.QRistikkoScene>}"""
 
-    def luoNivel(self, x, y):
+    def luoNivel(self, x, y, nimi=''):
         nivel = QNivel(self.ristikko, self.scene, x, y)
+        nivel.asetaNimi(nimi)
         return nivel
 
-    def luoSauva(self, nivel1, nivel2):
+    def luoSauva(self, nivel1, nivel2, nimi=''):
         sauva = QSauva(self.ristikko, nivel1, nivel2)
+        sauva.asetaNimi(nimi)
 
     def luoPistekuorma(self, nivel, kompX, kompY):
         pistekuorma = QPistekuorma(nivel, kompX, kompY)
 
-    def luoTuki(self, nivel, tyyppi, suuntakulma):
+    def luoTuki(self, nivel, tyyppi, suuntakulma, nimi=''):
         if tyyppi == Tuki.NIVELTUKI:
             tuki = QNiveltuki(nivel, suuntakulma)
         elif tyyppi == Tuki.RULLATUKI:
             tuki = QRullatuki(nivel, suuntakulma)
         else:
             raise RistikkoIOVirhe, 'Tuntematon tyyppi %i' % tyyppi
+
+        tuki.asetaNimi(nimi)

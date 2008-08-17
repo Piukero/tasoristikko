@@ -129,10 +129,11 @@ class QRistikkoScene(QtGui.QGraphicsScene):
     def asetaRistikko(self, ristikko):
         """Asettaa scenen ristikon.
         @param ristikko: lisättävä ristikko
-        @type ristikko: L{Ristikko<pyTasoristikko.ristikko.Ristikko>}"""
-        for w in self.widgetit:
-            if w in self.items():
-                self.removeItem(w)
+        @type ristikko: L{Ristikko<pyTasoristikko.ristikko.Ristikko>}
+        @todo: widgetit pitää saada jotenkin fiksusti pois"""
+#        for w in self.widgetit:
+#            if w in self.items():
+#                self.removeItem(w)
         if self.ristikko:
             self.ristikko.poista()
         self.ristikko = ristikko
